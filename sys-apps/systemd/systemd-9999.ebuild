@@ -27,8 +27,9 @@ RDEPEND="
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
 "
+# Depend on vala:0 slot, see bug 338067
 DEPEND="${RDEPEND}
-	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.9 )
+	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.9:0 )
 	>=sys-kernel/linux-headers-2.6.32
 "
 
