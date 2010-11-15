@@ -25,7 +25,7 @@ HOMEPAGE="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
-IUSE="selinux extras test"
+IUSE="selinux systemd extras test"
 
 COMMON_DEPEND="selinux? ( sys-libs/libselinux )
 	extras? (
@@ -199,6 +199,7 @@ src_compile() {
 		--enable-static \
 		$(use_with selinux) \
 		$(use_enable extras) \
+		$(use_with systemd "systemdsystemunitdir=${ROOT}lib/systemd/system") \
 		--disable-introspection
 	# we don't have gobject-introspection in portage tree
 
