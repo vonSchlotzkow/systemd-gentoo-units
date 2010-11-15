@@ -78,9 +78,5 @@ src_install() {
 		for i in killall poweroff reboot; do
 			doins "${FILESDIR}/${i}.service"
 		done
-
-		for i in xdm; do
-			rm "${D}"/lib/systemd/system/${i}.service
-		done
 	fi
 }
