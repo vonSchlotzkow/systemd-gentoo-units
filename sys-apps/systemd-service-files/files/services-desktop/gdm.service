@@ -1,0 +1,13 @@
+[Unit]
+Description=Gnome Display Manager
+After=syslog.target dbus.target hald.service console-kit-daemon.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/gdm -nodaemon --pidfile /var/run/gdm.pid
+ExecStop=/usr/sbin/gdm-stop
+PIDFile=/var/run/gdm.pid
+
+[Install]
+Alias=display-manager.service
+WantedBy=graphical.target
