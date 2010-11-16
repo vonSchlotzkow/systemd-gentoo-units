@@ -4,7 +4,7 @@
 
 EAPI=3
 
-inherit autotools git linux-info
+inherit autotools git linux-info pam
 
 DESCRIPTION="Replacement for sysvinit with extensive usage of parallelization"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -22,7 +22,7 @@ RDEPEND="
 	>=sys-fs/udev-162[systemd]
 	app-admin/tmpwatch
 	audit? ( sys-process/audit )
-	gtk? ( >=x11-libs/gtk+-2.20 )
+	gtk? ( >=x11-libs/gtk+-2.20 x11-libs/libnotify dev-libs/dbus-glib )
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
@@ -32,6 +32,8 @@ DEPEND="${RDEPEND}
 	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.9:0 )
 	>=sys-kernel/linux-headers-2.6.32
 "
+
+CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY"
 
 pkg_setup() {
 	linux-info_pkg_setup
@@ -52,8 +54,7 @@ src_configure() {
 	fi
 
 	econf --with-distro=gentoo \
-		--prefix=/usr \
-		--with-rootdir= \
+		--with-rootdir=${ROOT} \
 		$(use_enable audit) \
 		$(use_enable gtk) \
 		$(use_enable pam) \
