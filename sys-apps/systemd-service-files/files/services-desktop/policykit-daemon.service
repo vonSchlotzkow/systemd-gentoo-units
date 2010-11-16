@@ -1,0 +1,11 @@
+[Unit]
+Description=PolicyKit
+After=syslog.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.PolicyKit
+ExecStart=/usr/libexec/polkitd --no-exit
+
+[Install]
+WantedBy=graphical.target
