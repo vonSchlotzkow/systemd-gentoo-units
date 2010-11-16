@@ -1,0 +1,11 @@
+[Unit]
+Description=Syslog-ng
+DefaultDependencies=false
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/syslog-ng --pidfile /var/run/syslog-ng.pid
+PIDFile=/var/run/syslog-ng.pid
+
+[Install]
+WantedBy=sysinit.target

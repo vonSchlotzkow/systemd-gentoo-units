@@ -1,0 +1,10 @@
+[Unit]
+Description=WPA supplicant
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant.conf -iwlan0 -B -P /var/run/wpa_supplicant.pid
+PIDFile=/var/run/wpa_supplicant.pid
+
+[Install]
+WantedBy=graphical.target
