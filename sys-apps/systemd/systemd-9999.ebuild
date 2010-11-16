@@ -22,15 +22,14 @@ RDEPEND="
 	>=sys-fs/udev-162[systemd]
 	app-admin/tmpwatch
 	audit? ( sys-process/audit )
-	gtk? ( >=x11-libs/gtk+-2.20 x11-libs/libnotify dev-libs/dbus-glib )
+	gtk? ( >=x11-libs/gtk+-2.20 >=x11-libs/libnotify-0.7.0 dev-libs/dbus-glib )
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
 	sys-apps/systemd-service-files
 "
-# Depend on vala:0 slot, see bug 338067
 DEPEND="${RDEPEND}
-	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.9:0 )
+	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.11 )
 	>=sys-kernel/linux-headers-2.6.32
 "
 
