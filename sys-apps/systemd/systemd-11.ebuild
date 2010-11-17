@@ -25,7 +25,7 @@ RDEPEND="
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
-	sys-apps/systemd-service-files
+	sys-apps/systemd-units
 "
 # Depend on vala:0 slot, see bug 338067
 DEPEND="${RDEPEND}

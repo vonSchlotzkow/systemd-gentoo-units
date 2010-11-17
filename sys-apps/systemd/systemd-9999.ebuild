@@ -26,7 +26,7 @@ RDEPEND="
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
-	sys-apps/systemd-service-files
+	sys-apps/systemd-units
 "
 DEPEND="${RDEPEND}
 	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.11 )
