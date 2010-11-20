@@ -1,11 +1,9 @@
 [Unit]
-Description=Syslog-ng
-DefaultDependencies=false
+Description=Next Generation System Logging Service
 
 [Service]
-Type=forking
-ExecStart=/usr/sbin/syslog-ng --pidfile /var/run/syslog-ng.pid
-PIDFile=/var/run/syslog-ng.pid
+ExecStart=/usr/sbin/syslog-ng --foreground
+Restart=always
 
 [Install]
 WantedBy=sysinit.target
