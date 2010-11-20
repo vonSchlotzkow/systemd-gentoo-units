@@ -33,7 +33,7 @@ DEPEND="${RDEPEND}
 	>=sys-kernel/linux-headers-2.6.32
 "
 
-CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY"
+CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS"
 
 pkg_setup() {
 	linux-info_pkg_setup
