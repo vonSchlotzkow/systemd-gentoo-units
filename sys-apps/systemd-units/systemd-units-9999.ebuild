@@ -6,7 +6,9 @@ EAPI=3
 
 DESCRIPTION="Service files for sys-apps/systemd"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd http://en.gentoo-wiki.com/wiki/Systemd"
-SRC_URI=""
+SRC_URI="basic? ( http://0pointer.de/public/systemd-units/sshd.service
+	http://0pointer.de/public/systemd-units/sshd.socket
+	http://0pointer.de/public/systemd-units/sshd@.service )"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -26,6 +28,9 @@ doservices() {
 src_install() {
 	if use basic; then
 		doservices "${FILESDIR}"/services-basic/*
+		doservices "${DISTDIR}/sshd.service"
+		doservices "${DISTDIR}/sshd.socket"
+		doservices "${DISTDIR}/sshd@.service"
 	fi
 
 	if use desktop; then
