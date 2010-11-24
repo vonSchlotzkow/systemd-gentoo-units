@@ -47,16 +47,21 @@ src_prepare() {
 }
 
 src_configure() {
+	use prefix || local EPREFIX="${ROOT}"
+
 	local myconf=
 
 	if use sysv; then
-		myconf="${myconf} --with-sysvinit-path=/etc/init.d --with-sysvrcd-path=/etc"
+		myconf="${myconf} --with-sysvinit-path=\"${EPREFIX}\"etc/init.d"
+		myconf="${myconf} --with-sysvrcd-path=\"${EPREFIX}\"etc"
 	else
 		myconf="${myconf} --with-sysvinit-path= --with-sysvrcd-path="
 	fi
 
+	# econf sets localstatedir to /var/lib, but systemd expects /var
 	econf --with-distro=gentoo \
-		--with-rootdir=${ROOT} \
+		--with-rootdir="${EROOT}" \
+		--localstatedir="${EPREFIX}"/var \
 		$(use_enable audit) \
 		$(use_enable gtk) \
 		$(use_enable pam) \
@@ -66,12 +71,14 @@ src_configure() {
 }
 
 src_install() {
+	use prefix || local ED="${D}"
+
 	emake DESTDIR="${D}" install || die "emake install failed"
 
-	dodoc "${D}/usr/share/doc/systemd"/* && \
-	rm -r "${D}/usr/share/doc/systemd/"
+	dodoc "${ED}/usr/share/doc/systemd"/* && \
+	rm -r "${ED}/usr/share/doc/systemd/"
 
-	cd ${D}/usr/share/man/man8/
+	cd ${ED}/usr/share/man/man8/
 	for i in halt poweroff reboot runlevel shutdown telinit; do
 		mv ${i}.8 systemd.${i}.8
 	done
