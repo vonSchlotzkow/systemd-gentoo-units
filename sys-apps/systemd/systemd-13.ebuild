@@ -55,8 +55,11 @@ src_configure() {
 		myconf="${myconf} --with-sysvinit-path= --with-sysvrcd-path="
 	fi
 
+	# econf sets localstatedir to /var/lib, but systemd expects /var, see
+	# comment #73 on bug #318365
 	econf --with-distro=gentoo \
-		--with-rootdir=${ROOT} \
+		--with-rootdir= \
+		--localstatedir=/var \
 		$(use_enable audit) \
 		$(use_enable gtk) \
 		$(use_enable pam) \
