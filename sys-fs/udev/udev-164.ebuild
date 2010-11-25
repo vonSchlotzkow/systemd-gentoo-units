@@ -199,7 +199,7 @@ src_compile() {
 		--enable-static \
 		$(use_with selinux) \
 		$(use_enable extras) \
-		$(use_with systemd "systemdsystemunitdir=${ROOT}lib/systemd/system") \
+		$(use_with systemd "systemdsystemunitdir=/lib/systemd/system") \
 		--disable-introspection
 	# we don't have gobject-introspection in portage tree
 
