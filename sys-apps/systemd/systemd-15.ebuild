@@ -6,7 +6,7 @@ EAPI=3
 
 inherit autotools eutils linux-info pam
 
-DESCRIPTION="Replacement for sysvinit with extensive usage of parallelization"
+DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
 SRC_URI="http://www.freedesktop.org/software/systemd/${P}.tar.bz2"
 
@@ -41,16 +41,8 @@ pkg_setup() {
 	enewgroup lock # used by var-lock.mount
 }
 
-check_mtab_is_symlink() {
-	if test ! -L /etc/mtab; then
-		ewarn "/etc/mtab must be a symlink to /proc/self/mounts!"
-		ewarn "To correct that, execute"
-		ewarn "  ln -sf /proc/self/mounts /etc/mtab"
-	fi
-}
-
 src_prepare() {
-	epatch "${FILESDIR}"/0001-Revert-Revert-Revert-fsck-add-new-l-switch-to-fsck-m.patch || die "epatch failed"
+	epatch "${FILESDIR}"/0001-Revert-Revert-Revert-fsck-add-new-l-switch-to-fsck-m.patch
 }
 
 src_configure() {
@@ -89,6 +81,17 @@ src_install() {
 	for i in halt poweroff reboot runlevel shutdown telinit; do
 		mv ${i}.8 systemd.${i}.8
 	done
+}
 
+
+check_mtab_is_symlink() {
+	if test ! -L "${ROOT}"etc/mtab; then
+		ewarn "${ROOT}etc/mtab must be a symlink to ${ROOT}proc/self/mounts!"
+		ewarn "To correct that, execute"
+		ewarn "  ln -sf '${ROOT}proc/self/mounts' '${ROOT}etc/mtab'"
+	fi
+}
+
+pkg_postinst() {
 	check_mtab_is_symlink
 }
