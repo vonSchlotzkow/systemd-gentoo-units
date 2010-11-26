@@ -4,7 +4,7 @@
 
 EAPI=3
 
-inherit autotools eutils linux-info pam
+inherit eutils linux-info pam
 
 DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -82,7 +82,6 @@ src_install() {
 		mv ${i}.8 systemd.${i}.8
 	done
 }
-
 
 check_mtab_is_symlink() {
 	if test ! -L "${ROOT}"etc/mtab; then
