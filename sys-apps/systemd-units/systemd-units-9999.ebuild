@@ -19,7 +19,7 @@ RDEPEND=""
 DEPEND=""
 
 doservices() {
-	insinto "${ROOT}"lib/systemd/system
+	insinto /lib/systemd/system
 	for i in "$@" ; do
 		doins "$i" || die "doservices failed"
 	done
