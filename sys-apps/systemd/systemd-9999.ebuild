@@ -6,7 +6,7 @@ EAPI=3
 
 inherit autotools git linux-info pam
 
-DESCRIPTION="Replacement for sysvinit with extensive usage of parallelization"
+DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
 EGIT_REPO_URI="git://anongit.freedesktop.org/systemd"
 EGIT_BRANCH="master"
@@ -22,14 +22,14 @@ RDEPEND="
 	>=sys-fs/udev-162[systemd]
 	app-admin/tmpwatch
 	audit? ( sys-process/audit )
-	gtk? ( >=x11-libs/gtk+-2.20 >=x11-libs/libnotify-0.7.0 dev-libs/dbus-glib )
+	gtk? ( >=x11-libs/gtk+-2.20 x11-libs/libnotify dev-libs/dbus-glib )
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
 	sys-apps/systemd-units
 "
 DEPEND="${RDEPEND}
-	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.11 )
+	gtk? ( >=x11-libs/gtk+-2.20 dev-lang/vala:0.10 )
 	>=sys-kernel/linux-headers-2.6.32
 "
 
@@ -45,20 +45,21 @@ src_prepare() {
 }
 
 src_configure() {
-	use prefix || local EPREFIX="${ROOT}"
-
 	local myconf=
 
 	if use sysv; then
-		myconf="${myconf} --with-sysvinit-path=\"${EPREFIX}\"etc/init.d"
-		myconf="${myconf} --with-sysvrcd-path=\"${EPREFIX}\"etc"
+		myconf="${myconf} --with-sysvinit-path=/etc/init.d --with-sysvrcd-path=/etc"
 	else
 		myconf="${myconf} --with-sysvinit-path= --with-sysvrcd-path="
 	fi
 
+	if use gtk; then
+		export VALAC="$(type -p valac-0.10)"
+	fi
+
 	econf --with-distro=gentoo \
-		--with-rootdir=${EROOT} \
-		--localstatedir="${EPREFIX}"/var \
+		--with-rootdir= \
+		--localstatedir=/var \
 		$(use_enable audit) \
 		$(use_enable gtk) \
 		$(use_enable pam) \
@@ -68,14 +69,12 @@ src_configure() {
 }
 
 src_install() {
-	use prefix || local ED="${D}"
-
 	emake DESTDIR="${D}" install || die "emake install failed"
 
-	dodoc "${ED}/usr/share/doc/systemd"/* && \
-	rm -r "${ED}/usr/share/doc/systemd/"
+	dodoc "${D}/usr/share/doc/systemd"/* && \
+	rm -r "${D}/usr/share/doc/systemd/"
 
-	cd ${ED}/usr/share/man/man8/
+	cd "${D}"/usr/share/man/man8/
 	for i in halt poweroff reboot runlevel shutdown telinit; do
 		mv ${i}.8 systemd.${i}.8
 	done
