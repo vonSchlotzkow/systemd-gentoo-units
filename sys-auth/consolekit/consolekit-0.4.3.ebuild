@@ -15,7 +15,7 @@ SRC_URI="http://www.freedesktop.org/software/${MY_PN}/dist/${MY_P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd ~x86-freebsd ~amd64-linux ~ia64-linux ~x86-linux"
-IUSE="debug doc kernel_linux pam policykit test"
+IUSE="debug doc kernel_linux pam policykit systemd test"
 
 RDEPEND=">=dev-libs/dbus-glib-0.82
 	>=dev-libs/glib-2.20:2
@@ -58,6 +58,7 @@ src_configure() {
 		$(use_enable doc docbook-docs) \
 		$(use_enable debug) \
 		$(use_enable policykit polkit) \
+		"$(use_with systemd "systemdsystemunitdir=${EPREFIX}/lib/systemd/system")" \
 		--with-dbus-services="${EPREFIX}"/usr/share/dbus-1/services \
 		--with-pam-module-dir=$(getpam_mod_dir)
 }
