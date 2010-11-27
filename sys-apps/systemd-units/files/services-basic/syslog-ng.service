@@ -3,7 +3,6 @@ Description=Next Generation System Logging Service
 
 [Service]
 ExecStart=/usr/sbin/syslog-ng --foreground
-Restart=always
 
 [Install]
-WantedBy=sysinit.target
+WantedBy=multi-user.target
