@@ -14,5 +14,5 @@ RefuseManualStart=yes
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart="/bin/bash -c 'killall5 -15; sleep 1; killall5 -9; sleep 1'"
+ExecStart=/bin/bash -c 'killall5 -15; sleep 1; killall5 -9; sleep 1'
 StandardOutput=tty
