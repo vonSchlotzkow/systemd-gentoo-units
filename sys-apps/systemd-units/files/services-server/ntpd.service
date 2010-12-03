@@ -1,0 +1,8 @@
+[Unit]
+Description=ntpd - Network Time Protocol daemon
+
+[Service]
+ExecStart=/usr/sbin/ntpd -n
+
+[Install]
+WantedBy=multi-user.target
