@@ -45,3 +45,9 @@ src_install() {
 		doservices "${FILESDIR}"/services-sysv/*
 	fi
 }
+
+pkg_postinst() {
+	elog "NetworkManager.service has been removed, because it is included"
+	elog "upstream.  Emerge >=net-misc/networkmanager-0.8.2 if you use"
+	elog "NetworkManager."
+}
