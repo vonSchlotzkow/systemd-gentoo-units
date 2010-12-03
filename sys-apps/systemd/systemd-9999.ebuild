@@ -78,11 +78,4 @@ src_install() {
 	for i in halt poweroff reboot runlevel shutdown telinit; do
 		mv ${i}.8 systemd.${i}.8
 	done
-
-	if ! use sysv; then
-		insinto /lib/systemd/system
-		for i in killall poweroff reboot; do
-			doins "${FILESDIR}/${i}.service"
-		done
-	fi
 }
