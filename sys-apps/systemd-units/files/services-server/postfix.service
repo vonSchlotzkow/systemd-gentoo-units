@@ -1,5 +1,6 @@
 [Unit]
 Description=Postfix Mail Daemon
+After=network.target
 
 [Service]
 Type=forking

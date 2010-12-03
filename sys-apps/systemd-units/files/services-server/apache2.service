@@ -1,5 +1,6 @@
 [Unit]
 Description=Apache 2 HTTP Web Server
+After=network.target
 
 [Service]
 Type=forking
