@@ -1,0 +1,11 @@
+[Unit]
+Description=Postfix Mail Daemon
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/postfix start
+ExecStop=/usr/sbin/postfix stop
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

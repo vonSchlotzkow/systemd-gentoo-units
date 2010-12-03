@@ -13,7 +13,7 @@ SRC_URI="basic? ( http://0pointer.de/public/systemd-units/sshd.service
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+basic +desktop sysv"
+IUSE="+basic +desktop server sysv"
 
 RDEPEND=""
 DEPEND=""
@@ -31,6 +31,10 @@ src_install() {
 		doservices "${DISTDIR}/sshd.service"
 		doservices "${DISTDIR}/sshd.socket"
 		doservices "${DISTDIR}/sshd@.service"
+	fi
+
+	if use server; then
+		doservices "${FILESDIR}"/services-server/*
 	fi
 
 	if use desktop; then
