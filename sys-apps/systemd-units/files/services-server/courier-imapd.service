@@ -1,5 +1,6 @@
 [Unit]
 Description=Courier IMAP Daemon
+After=network.target
 
 [Service]
 Type=forking
