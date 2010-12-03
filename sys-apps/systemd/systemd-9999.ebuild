@@ -22,7 +22,9 @@ RDEPEND="
 	>=sys-fs/udev-162[systemd]
 	app-admin/tmpwatch
 	audit? ( sys-process/audit )
-	gtk? ( >=x11-libs/gtk+-2.20 x11-libs/libnotify dev-libs/dbus-glib )
+	gtk? (	>=x11-libs/gtk+-2.20
+			x11-libs/libnotify
+			dev-libs/dbus-glib )
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
@@ -41,6 +43,7 @@ pkg_setup() {
 }
 
 src_prepare() {
+	epatch "${FILESDIR}"/0001-Revert-Revert-Revert-fsck-add-new-l-switch-to-fsck-m.patch
 	eautoreconf
 }
 
@@ -72,10 +75,22 @@ src_install() {
 	emake DESTDIR="${D}" install || die "emake install failed"
 
 	dodoc "${D}/usr/share/doc/systemd"/* && \
-	rm -r "${D}/usr/share/doc/systemd/"
+		rm -r "${D}/usr/share/doc/systemd/"
 
 	cd "${D}"/usr/share/man/man8/
 	for i in halt poweroff reboot runlevel shutdown telinit; do
 		mv ${i}.8 systemd.${i}.8
 	done
+}
+
+check_mtab_is_symlink() {
+	if test ! -L "${ROOT}"etc/mtab; then
+		ewarn "${ROOT}etc/mtab must be a symlink to ${ROOT}proc/self/mounts!"
+		ewarn "To correct that, execute"
+		ewarn "  ln -sf '${ROOT}proc/self/mounts' '${ROOT}etc/mtab'"
+	fi
+}
+
+pkg_postinst() {
+	check_mtab_is_symlink
 }
