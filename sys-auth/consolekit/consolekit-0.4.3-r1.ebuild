@@ -45,7 +45,8 @@ src_prepare() {
 		"${FILESDIR}"/${PN}-0.2.10-cleanup_console_tags.patch \
 		"${FILESDIR}"/${PN}-0.4.0-polkit-automagic.patch \
 		"${FILESDIR}"/${PN}-0.4.0-multilib.patch \
-		"${FILESDIR}"/${PN}-0.4.1-shutdown-reboot-without-policies.patch
+		"${FILESDIR}"/${PN}-0.4.1-shutdown-reboot-without-policies.patch \
+		"${FILESDIR}"/consolekit-0.4.3-systemd-fix-name-of-unit.patch
 
 	eautoreconf
 }
