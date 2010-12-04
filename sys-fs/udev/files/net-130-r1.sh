@@ -5,6 +5,11 @@
 # Copyright 2007 Roy Marples <uberlord@gentoo.org>
 # Distributed under the terms of the GNU General Public License v2
 
+if test "`ps -p 1 -o comm=`" = "systemd"; then
+	logger -t "$0" "You are using systemd, exiting. (${@:1})"
+	exit
+fi
+
 IFACE=$1
 ACTION=$2
 
