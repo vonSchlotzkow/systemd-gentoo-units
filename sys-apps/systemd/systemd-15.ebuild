@@ -4,7 +4,7 @@
 
 EAPI=3
 
-inherit eutils linux-info pam
+inherit linux-info pam
 
 DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -16,9 +16,9 @@ KEYWORDS="~amd64 ~x86"
 IUSE="audit gtk pam +tcpwrap sysv selinux"
 
 RDEPEND="
-	>=sys-apps/dbus-1.3.2[systemd]
+	>=sys-apps/dbus-1.4.0[systemd]
 	sys-libs/libcap
-	>=sys-fs/udev-162[systemd]
+	>=sys-fs/udev-163[systemd]
 	app-admin/tmpwatch
 	audit? ( sys-process/audit )
 	gtk? (	>=x11-libs/gtk+-2.20
@@ -30,7 +30,7 @@ RDEPEND="
 	sys-apps/systemd-units
 "
 DEPEND="${RDEPEND}
-	gtk? ( >=x11-libs/gtk+-2.20 >=dev-lang/vala-0.11 )
+	gtk? ( >=dev-lang/vala-0.11 )
 	>=sys-kernel/linux-headers-2.6.32
 "
 
@@ -75,7 +75,7 @@ src_install() {
 	emake DESTDIR="${D}" install || die "emake install failed"
 
 	dodoc "${D}/usr/share/doc/systemd"/* && \
-	rm -r "${D}/usr/share/doc/systemd/"
+		rm -r "${D}/usr/share/doc/systemd/"
 
 	cd "${D}"/usr/share/man/man8/
 	for i in halt poweroff reboot runlevel shutdown telinit; do
