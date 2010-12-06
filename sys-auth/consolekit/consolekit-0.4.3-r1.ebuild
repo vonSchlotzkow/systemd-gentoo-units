@@ -59,7 +59,7 @@ src_configure() {
 		$(use_enable doc docbook-docs) \
 		$(use_enable debug) \
 		$(use_enable policykit polkit) \
-		"$(use_with systemd "systemdsystemunitdir=${EPREFIX}/lib/systemd/system")" \
+		"$(use_with systemd "systemdsystemunitdir=${EPREFIX}/$(get_libdir)/systemd/system")" \
 		--with-dbus-services="${EPREFIX}"/usr/share/dbus-1/services \
 		--with-pam-module-dir=$(getpam_mod_dir)
 }

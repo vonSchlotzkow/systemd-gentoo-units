@@ -83,7 +83,7 @@ src_configure() {
 		$(use_enable selinux)
 		$(use_enable selinux libaudit)
 		$(use_enable static-libs static)
-		$(use_with systemd "systemdsystemunitdir=/lib/systemd/system")
+		$(use_with systemd "systemdsystemunitdir=/$(get_libdir)/systemd/system")
 		--enable-shared
 		--with-xml=expat
 		--with-system-pid-file=/var/run/dbus.pid

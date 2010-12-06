@@ -144,7 +144,7 @@ src_configure() {
 		--disable-qt3 \
 		$(use_enable qt4) \
 		$(use_enable gdbm) \
-		$(use_with systemd systemdsystemunitdir=/lib/systemd/system) \
+		$(use_with systemd systemdsystemunitdir=/$(get_libdir)/systemd/system) \
 		${myconf}
 }
 
