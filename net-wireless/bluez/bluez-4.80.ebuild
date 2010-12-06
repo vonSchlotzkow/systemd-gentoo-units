@@ -92,6 +92,13 @@ src_configure() {
 		--disable-hal
 }
 
+doservices() {
+	insinto /$(get_libdir)/systemd/system
+	for i in "$@" ; do
+		doins "$i" || die "doservices failed"
+	done
+}
+
 src_install() {
 	emake DESTDIR="${ED}" install || die "make install failed"
 
@@ -136,6 +143,8 @@ src_install() {
 	# Install oui.txt as requested in bug #283791 and approved by upstream
 	insinto /var/lib/misc
 	newins "${DISTDIR}/oui-${OUIDATE}.txt" oui.txt || die
+
+	doservices "${FILESDIR}"/bluetooth.service
 
 	find "${ED}" -name "*.la" -delete || die "remove of la files failed"
 }
