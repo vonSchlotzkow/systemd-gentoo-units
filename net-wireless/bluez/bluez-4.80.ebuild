@@ -16,7 +16,7 @@ LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~x86"
 
-IUSE="alsa attrib caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat test-programs usb"
+IUSE="alsa attrib caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat systemd test-programs usb"
 
 CDEPEND="alsa? (
 		media-libs/alsa-lib[alsa_pcm_plugins_extplug,alsa_pcm_plugins_ioplug]
@@ -58,6 +58,11 @@ src_prepare() {
 	if use cups; then
 		sed -i -e "s:cupsdir = \$(libdir)/cups:cupsdir = `cups-config --serverbin`:" \
 			Makefile.tools Makefile.in || die
+	fi
+
+	cp "${FILESDIR}/${PN}-4.18-udev.script" "${S}" || die
+	if use systemd; then
+		epatch "${FILESDIR}/${PN}-4.18-udev-systemd.patch" || die
 	fi
 }
 
@@ -135,7 +140,7 @@ src_install() {
 	insinto /etc/udev/rules.d/
 	newins "${FILESDIR}/${PN}-4.18-udev.rules" 70-bluetooth.rules || die
 	exeinto /$(get_libdir)/udev/
-	newexe "${FILESDIR}/${PN}-4.18-udev.script" bluetooth.sh || die
+	newexe "${PN}-4.18-udev.script" bluetooth.sh || die
 
 	newinitd "${FILESDIR}/bluetooth-init.d" bluetooth || die
 	newconfd "${FILESDIR}/4.60/bluetooth-conf.d" bluetooth || die
@@ -144,7 +149,9 @@ src_install() {
 	insinto /var/lib/misc
 	newins "${DISTDIR}/oui-${OUIDATE}.txt" oui.txt || die
 
-	doservices "${FILESDIR}"/bluetooth.service
+	if use systemd; then
+		doservices "${FILESDIR}"/bluetooth.service
+	fi
 
 	find "${ED}" -name "*.la" -delete || die "remove of la files failed"
 }

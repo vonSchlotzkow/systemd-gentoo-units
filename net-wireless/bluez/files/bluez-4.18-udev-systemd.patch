@@ -1,0 +1,15 @@
+diff --git a/net-wireless/bluez/files/bluez-4.18-udev.script b/net-wireless/bluez/files/bluez-4.18-udev.script
+--- bluez-4.18-udev.script
++++ bluez-4.18-udev.script
+@@ -8,6 +8,11 @@
+ #   2008      Tiziano Müller <dev-zero@gentoo.org>
+ # Distributed under the terms of the GNU General Public License v2
+ 
++if test "`ps -p 1 -o comm=`" = "systemd"; then
++	logger -t "$0" "You are using systemd, exiting. (bluetooth.sh)"
++	exit
++fi
++
+ script=/etc/init.d/bluetooth
+ 
+ # Find out where sysfs is mounted. Exit if not available
