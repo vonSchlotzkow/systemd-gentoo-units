@@ -2,9 +2,7 @@
 Description=Dhcpcd
 
 [Service]
-Type=forking
-ExecStart=/sbin/dhcpcd -q
-PIDFile=/var/run/dhcpcd.pid
+ExecStart=/sbin/dhcpcd -q --nobackground
 
 [Install]
-WantedBy=graphical.target
+WantedBy=graphical.target network.target
