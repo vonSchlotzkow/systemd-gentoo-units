@@ -84,7 +84,7 @@ pkg_setup() {
 src_prepare() {
 	# accept "gw" in /etc/conf.d/net (bug #339215)
 	epatch "${FILESDIR}/${P}-accept-gw.patch"
-	epatch "${FILESDIR}/${P}-systemd+openrc.patch"
+	epatch "${FILESDIR}/${P}-openrc-and-systemd.patch"
 }
 
 src_configure() {
