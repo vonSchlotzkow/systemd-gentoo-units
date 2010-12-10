@@ -96,8 +96,7 @@ src_configure() {
 		--with-iptables=/sbin/iptables
 		$(use_enable doc gtk-doc)
 		$(use_with doc docs)
-		$(use_with resolvconf)
-		$(use_with systemd systemdsystemunitdir=/$(get_libdir)/systemd/system)"
+		$(use_with resolvconf)"
 
 	# default is dhcpcd (if none or both are specified), ISC dchclient otherwise
 	if use dhclient ; then
@@ -119,6 +118,12 @@ src_configure() {
 		fi
 	else
 		ECONF="${ECONF} --with-crypto=nss"
+	fi
+
+	if use systemd; then
+		ECONF="${ECONF} --with-systemdsystemunitdir=/$(get_libdir)/systemd/system"
+	else
+		ECONF="${ECONF} --without-systemdsystemunitdir"
 	fi
 
 	econf ${ECONF}
