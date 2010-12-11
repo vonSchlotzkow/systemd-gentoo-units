@@ -8,7 +8,7 @@ PYTHON_DEPEND="python? 2"
 PYTHON_USE_WITH="gdbm"
 PYTHON_USE_WITH_OPT="python"
 
-inherit eutils mono python multilib flag-o-matic
+inherit eutils mono python multilib flag-o-matic systemd
 
 DESCRIPTION="System which facilitates service discovery on a local network"
 HOMEPAGE="http://avahi.org/"
@@ -17,7 +17,7 @@ SRC_URI="http://avahi.org/download/${P}.tar.gz"
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
-IUSE="autoipd bookmarks dbus doc gdbm gtk howl-compat ipv6 kernel_linux mdnsresponder-compat mono python qt4 systemd test "
+IUSE="autoipd bookmarks dbus doc gdbm gtk howl-compat ipv6 kernel_linux mdnsresponder-compat mono python qt4 test "
 
 DBUS_DEPEND=">=sys-apps/dbus-0.30"
 RDEPEND=">=dev-libs/libdaemon-0.14
@@ -144,7 +144,7 @@ src_configure() {
 		--disable-qt3 \
 		$(use_enable qt4) \
 		$(use_enable gdbm) \
-		$(use_with systemd systemdsystemunitdir=/$(get_libdir)/systemd/system) \
+		"$(use_with_systemdsystemunitdir)" \
 		${myconf}
 }
 

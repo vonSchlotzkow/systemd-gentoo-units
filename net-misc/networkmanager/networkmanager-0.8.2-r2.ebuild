@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit gnome.org linux-info
+inherit gnome.org linux-info systemd
 
 # NetworkManager likes itself with capital letters
 MY_PN=${PN/networkmanager/NetworkManager}
@@ -17,7 +17,7 @@ SRC_URI="${SRC_URI//${PN}/${MY_PN}}"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~ppc ~ppc64 ~x86"
-IUSE="avahi bluetooth connection-sharing doc nss gnutls dhclient dhcpcd kernel_linux resolvconf systemd"
+IUSE="avahi bluetooth connection-sharing doc nss gnutls dhclient dhcpcd kernel_linux resolvconf"
 
 RDEPEND=">=sys-apps/dbus-1.2
 	>=dev-libs/dbus-glib-0.75
@@ -120,13 +120,7 @@ src_configure() {
 		ECONF="${ECONF} --with-crypto=nss"
 	fi
 
-	if use systemd; then
-		ECONF="${ECONF} --with-systemdsystemunitdir=/$(get_libdir)/systemd/system"
-	else
-		ECONF="${ECONF} --without-systemdsystemunitdir"
-	fi
-
-	econf ${ECONF}
+	econf ${ECONF} "$(use_with_systemdsystemunitdir)"
 }
 
 src_install() {
