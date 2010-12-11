@@ -4,7 +4,7 @@
 
 EAPI="3"
 
-inherit multilib eutils
+inherit multilib eutils systemd
 
 DESCRIPTION="Bluetooth Tools and System Daemons for Linux"
 HOMEPAGE="http://www.bluez.org/"
@@ -16,7 +16,7 @@ LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~x86"
 
-IUSE="alsa attrib caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat systemd test-programs usb"
+IUSE="alsa attrib caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat test-programs usb"
 
 CDEPEND="alsa? (
 		media-libs/alsa-lib[alsa_pcm_plugins_extplug,alsa_pcm_plugins_ioplug]
@@ -95,13 +95,6 @@ src_configure() {
 		$(use_enable debug) \
 		--localstatedir=/var \
 		--disable-hal
-}
-
-doservices() {
-	insinto /$(get_libdir)/systemd/system
-	for i in "$@" ; do
-		doins "$i" || die "doservices failed"
-	done
 }
 
 src_install() {
