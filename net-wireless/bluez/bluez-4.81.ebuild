@@ -1,6 +1,6 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.80.ebuild,v 1.1 2010/11/25 23:36:27 pacho Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.81.ebuild,v 1.1 2010/12/10 19:51:22 pacho Exp $
 
 EAPI="3"
 
@@ -9,7 +9,7 @@ inherit multilib eutils systemd
 DESCRIPTION="Bluetooth Tools and System Daemons for Linux"
 HOMEPAGE="http://www.bluez.org/"
 
-OUIDATE="20101126" # Needed because of bug #345263
+OUIDATE="20101210" # Needed because of bug #345263
 SRC_URI="mirror://kernel/linux/bluetooth/${P}.tar.gz
 	http://standards.ieee.org/regauth/oui/oui.txt -> oui-${OUIDATE}.txt"
 LICENSE="GPL-2 LGPL-2.1"
