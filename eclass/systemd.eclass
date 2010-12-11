@@ -10,6 +10,9 @@
 # hsggebhardt@googlemail.com.
 #
 
+# We need the get_libdir function
+inherit multilib
+
 IUSE="systemd"
 
 # doservices: install systemd .service files. Usage is 'doservices files....'.
