@@ -3,6 +3,7 @@
 # $Header: $
 
 EAPI=3
+inherit systemd
 
 DESCRIPTION="Service files for sys-apps/systemd"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd http://en.gentoo-wiki.com/wiki/Systemd"
@@ -17,13 +18,6 @@ IUSE="+basic +desktop server sysv"
 
 RDEPEND=""
 DEPEND=""
-
-doservices() {
-	insinto /lib/systemd/system
-	for i in "$@" ; do
-		doins "$i" || die "doservices failed"
-	done
-}
 
 src_install() {
 	if use basic; then
