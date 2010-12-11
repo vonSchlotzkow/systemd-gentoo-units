@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit autotools eutils multilib flag-o-matic
+inherit autotools eutils multilib flag-o-matic systemd
 
 DESCRIPTION="A message bus system, a simple way for applications to talk to each other"
 HOMEPAGE="http://dbus.freedesktop.org/"
@@ -13,7 +13,7 @@ SRC_URI="http://dbus.freedesktop.org/releases/dbus/${P}.tar.gz"
 LICENSE="|| ( GPL-2 AFL-2.1 )"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
-IUSE="debug doc selinux static-libs systemd test X"
+IUSE="debug doc selinux static-libs test X"
 
 CDEPEND="
 	X? (
@@ -83,7 +83,7 @@ src_configure() {
 		$(use_enable selinux)
 		$(use_enable selinux libaudit)
 		$(use_enable static-libs static)
-		$(use_with systemd "systemdsystemunitdir=/$(get_libdir)/systemd/system")
+		$(use_with_systemdsystemunitdir)
 		--enable-shared
 		--with-xml=expat
 		--with-system-pid-file=/var/run/dbus.pid
