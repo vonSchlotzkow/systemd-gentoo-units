@@ -44,4 +44,10 @@ pkg_postinst() {
 	elog "NetworkManager.service has been removed, because it is included"
 	elog "upstream.  Emerge >=net-misc/networkmanager-0.8.2 if you use"
 	elog "NetworkManager."
+	elog
+	elog "The gdm.service has been removed in favour of gdm@.service.  Please"
+	elog "remove the stale symlinks 'display-manager.service' and"
+	elog "'graphical.target.wants/gdm.service' under '/etc/systemd/system'"
+	elog "if you had them enabled, and enable the new service file with"
+	elog "    systemctl enable gdm@.service"
 }
