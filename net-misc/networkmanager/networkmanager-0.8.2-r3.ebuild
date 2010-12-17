@@ -82,9 +82,13 @@ pkg_setup() {
 }
 
 src_prepare() {
+	# dbus policy patch
+	epatch "${FILESDIR}/${P}-confchanges.patch"
 	# accept "gw" in /etc/conf.d/net (bug #339215)
 	epatch "${FILESDIR}/${P}-accept-gw.patch"
 	epatch "${FILESDIR}/${P}-openrc-and-systemd.patch"
+	# Backports #1
+	epatch "${FILESDIR}/${P}-1.patch"
 }
 
 src_configure() {
