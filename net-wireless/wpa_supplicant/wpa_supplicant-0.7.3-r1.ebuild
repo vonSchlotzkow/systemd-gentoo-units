@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit eutils toolchain-funcs qt4-r2
+inherit eutils toolchain-funcs qt4-r2 systemd
 
 DESCRIPTION="IEEE 802.1X/WPA supplicant for secure wireless transfers"
 HOMEPAGE="http://hostap.epitest.fi/wpa_supplicant/"
@@ -75,6 +75,12 @@ src_prepare() {
 
 	# bug (320097)
 	epatch "${FILESDIR}/do-not-call-dbus-functions-with-NULL-path.patch"
+
+	if use systemd; then
+		echo "SystemdService=dbus-fi.epitest.hostap.WPASupplicant.service" \
+			>> "dbus/fi.epitest.hostap.WPASupplicant.service" \
+			|| die "failed to patch dbus service file for systemd activation"
+	fi
 }
 
 src_configure() {
@@ -241,6 +247,9 @@ src_install() {
 		insinto /usr/share/dbus-1/system-services
 		doins fi.epitest.hostap.WPASupplicant.service || die
 		keepdir /var/run/wpa_supplicant
+		if use systemd; then
+			doservices "${FILESDIR}"/wpa_supplicant.service
+		fi
 	fi
 }
 
