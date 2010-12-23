@@ -10,15 +10,12 @@
 # hsggebhardt@googlemail.com.
 #
 
-# We need the get_libdir function
-inherit multilib
-
 IUSE="systemd"
 
 # doservices: install systemd .service files. Usage is 'doservices files....'.
 doservices() {
 	[[ -z "${1}" ]] && die "usage: doservices <files...>"
-	insinto "/$(get_libdir)/systemd/system"
+	insinto "/lib/systemd/system"
 	for i in "$@" ; do
 		doins "$i" || die "doservices failed to install '$i'"
 	done
@@ -28,7 +25,7 @@ doservices() {
 # USE flag.
 use_with_systemdsystemunitdir() {
 	if use systemd; then
-		echo "--with-systemdsystemunitdir=/$(get_libdir)/systemd/system"
+		echo "--with-systemdsystemunitdir=/lib/systemd/system"
 	else
 		echo "--without-systemdsystemunitdir"
 	fi
