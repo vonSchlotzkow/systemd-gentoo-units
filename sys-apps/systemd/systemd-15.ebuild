@@ -19,7 +19,6 @@ RDEPEND="
 	>=sys-apps/dbus-1.4.0[systemd]
 	sys-libs/libcap
 	>=sys-fs/udev-163[systemd]
-	app-admin/tmpwatch
 	audit? ( sys-process/audit )
 	gtk? (	>=x11-libs/gtk+-2.20
 			>=x11-libs/libnotify-0.7.0
