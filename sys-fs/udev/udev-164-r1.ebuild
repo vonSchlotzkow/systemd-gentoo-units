@@ -4,7 +4,7 @@
 
 EAPI="1"
 
-inherit eutils flag-o-matic multilib toolchain-funcs linux-info
+inherit eutils flag-o-matic multilib toolchain-funcs linux-info systemd
 
 #PATCHSET=${P}-gentoo-patchset-v1
 scriptversion=164
@@ -27,7 +27,7 @@ HOMEPAGE="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
-IUSE="selinux extras test"
+IUSE="selinux extras +openrc test"
 
 COMMON_DEPEND="selinux? ( sys-libs/libselinux )
 	extras? (
@@ -206,6 +206,7 @@ src_compile() {
 		--enable-static \
 		$(use_with selinux) \
 		$(use_enable extras) \
+		"$(use_with_systemdsystemunitdir)" \
 		--disable-introspection
 	# we don't have gobject-introspection in portage tree
 
@@ -217,6 +218,11 @@ src_install() {
 		DESTDIR="${D}" LIBDIR="$(get_libdir)" \
 		KV_min="${KV_min}" KV_reliable="${KV_reliable}" \
 		install || die "make install failed"
+
+	if ! use openrc; then
+		rm "${D}/$(get_libdir)/udev/rules.d/90-network.rules" || die
+		rm "${D}/$(get_libdir)/udev/net.sh" || die
+	fi
 
 	into /
 	emake DESTDIR="${D}" install || die "make install failed"
