@@ -1,13 +1,14 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-164.ebuild,v 1.1 2010/10/30 13:53:54 zzam Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-164-r1.ebuild,v 1.1 2010/12/12 22:12:43 zzam Exp $
 
 EAPI="1"
 
-inherit eutils flag-o-matic multilib toolchain-funcs linux-info systemd
+inherit eutils flag-o-matic multilib toolchain-funcs linux-info
 
 #PATCHSET=${P}-gentoo-patchset-v1
 scriptversion=164
+scriptname=${PN}-gentoo-scripts-${scriptversion}
 
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="git://git.kernel.org/pub/scm/linux/hotplug/udev.git"
@@ -16,7 +17,8 @@ if [[ ${PV} == "9999" ]]; then
 else
 	# please update testsys-tarball whenever udev-xxx/test/sys/ is changed
 	SRC_URI="mirror://kernel/linux/utils/kernel/hotplug/${P}.tar.bz2
-			 test? ( mirror://gentoo/${PN}-151-testsys.tar.bz2 )"
+			 test? ( mirror://gentoo/${PN}-151-testsys.tar.bz2 )
+			 mirror://gentoo/${scriptname}.tar.bz2"
 	[[ -n "${PATCHSET}" ]] && SRC_URI="${SRC_URI} mirror://gentoo/${PATCHSET}.tar.bz2"
 fi
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
@@ -183,6 +185,11 @@ src_unpack() {
 		gtkdocize --copy
 		eautoreconf
 	fi
+
+	cd "${WORKDIR}/${scriptname}"
+	sed_libexec_dir \
+		helpers/* \
+		rc/*/*
 }
 
 src_compile() {
@@ -199,7 +206,6 @@ src_compile() {
 		--enable-static \
 		$(use_with selinux) \
 		$(use_enable extras) \
-		"$(use_with_systemdsystemunitdir)" \
 		--disable-introspection
 	# we don't have gobject-introspection in portage tree
 
@@ -207,23 +213,15 @@ src_compile() {
 }
 
 src_install() {
-	local scriptdir="${FILESDIR}/${scriptversion}"
+	emake -C "${WORKDIR}/${scriptname}" \
+		DESTDIR="${D}" LIBDIR="$(get_libdir)" \
+		KV_min="${KV_min}" KV_reliable="${KV_reliable}" \
+		install || die "make install failed"
 
 	into /
 	emake DESTDIR="${D}" install || die "make install failed"
 
 	exeinto "${udev_libexec_dir}"
-	newexe "${FILESDIR}"/net-130-r1.sh net.sh	|| die "net.sh not installed properly"
-	newexe "${FILESDIR}"/move_tmp_persistent_rules-112-r1.sh move_tmp_persistent_rules.sh \
-		|| die "move_tmp_persistent_rules.sh not installed properly"
-	newexe "${FILESDIR}"/write_root_link_rule-125 write_root_link_rule \
-		|| die "write_root_link_rule not installed properly"
-
-	doexe "${scriptdir}"/shell-compat-KV.sh \
-		|| die "shell-compat.sh not installed properly"
-	doexe "${scriptdir}"/shell-compat-addon.sh \
-		|| die "shell-compat.sh not installed properly"
-
 	keepdir "${udev_libexec_dir}"/state
 	keepdir "${udev_libexec_dir}"/devices
 
@@ -242,9 +240,6 @@ src_install() {
 	cd "${S}"/rules
 	insinto "${udev_libexec_dir}"/rules.d/
 
-	# Our rules files
-	doins "${scriptdir}"/??-*.rules
-
 	# support older kernels
 	doins misc/30-kernel-compat.rules
 
@@ -255,40 +250,9 @@ src_install() {
 	fi
 	cd "${S}"
 
-	# our udev hooks into the rc system
-	insinto /$(get_libdir)/rcscripts/addons
-	doins "${scriptdir}"/udev-start.sh \
-		|| die "udev-start.sh not installed properly"
-	doins "${scriptdir}"/udev-stop.sh \
-		|| die "udev-stop.sh not installed properly"
-
-	local init
-	# udev-postmount and init-scripts for >=openrc-0.3.1, Bug #240984
-	for init in udev udev-mount udev-dev-tarball udev-postmount; do
-		newinitd "${scriptdir}/${init}.initd" "${init}" \
-			|| die "initscript ${init} not installed properly"
-	done
-
-	# insert minimum kernel versions
-	sed -e "s/%KV_MIN%/${KV_min}/" \
-		-e "s/%KV_MIN_RELIABLE%/${KV_reliable}/" \
-		-i "${D}"/etc/init.d/udev-mount
-
-	# config file for init-script and start-addon
-	newconfd "${scriptdir}/udev.confd" udev \
-		|| die "config file not installed properly"
-
 	insinto /etc/modprobe.d
 	newins "${FILESDIR}"/blacklist-146 blacklist.conf
 	newins "${FILESDIR}"/pnp-aliases pnp-aliases.conf
-
-	# convert /lib/udev to real used dir
-	sed_libexec_dir \
-		"${D}/$(get_libdir)"/rcscripts/addons/*.sh \
-		"${D}/${udev_libexec_dir}"/write_root_link_rule \
-		"${D}"/etc/conf.d/udev \
-		"${D}"/etc/init.d/udev* \
-		"${D}"/etc/modprobe.d/*
 
 	# documentation
 	dodoc ChangeLog README TODO || die "failed installing docs"
