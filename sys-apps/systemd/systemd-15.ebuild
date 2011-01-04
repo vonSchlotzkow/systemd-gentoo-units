@@ -4,7 +4,7 @@
 
 EAPI=3
 
-inherit linux-info pam
+inherit autotools linux-info pam
 
 DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -21,15 +21,16 @@ RDEPEND="
 	>=sys-fs/udev-163[systemd]
 	audit? ( sys-process/audit )
 	gtk? (	>=x11-libs/gtk+-2.20
-			>=x11-libs/libnotify-0.7.0
+			x11-libs/libnotify
 			dev-libs/dbus-glib )
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
 	sys-apps/systemd-units
 "
+VALASLOT="0.10"
 DEPEND="${RDEPEND}
-	gtk? ( >=dev-lang/vala-0.11 )
+	gtk? ( dev-lang/vala:$VALASLOT )
 	>=sys-kernel/linux-headers-2.6.32
 "
 
@@ -41,7 +42,8 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/0001-Revert-Revert-Revert-fsck-add-new-l-switch-to-fsck-m.patch
+	EPATCH_SUFFIX="patch" EPATCH_FORCE="yes" epatch "${FILESDIR}"
+	eautoreconf
 }
 
 src_configure() {
@@ -54,7 +56,7 @@ src_configure() {
 	fi
 
 	if use gtk; then
-		export VALAC="$(type -p valac-0.12)"
+		export VALAC="$(type -p valac-$VALASLOT)"
 	fi
 
 	# econf sets localstatedir to /var/lib, but systemd expects /var, see
