@@ -44,6 +44,11 @@ pkg_setup() {
 
 src_prepare() {
 	epatch "${FILESDIR}"/0001-Revert-Revert-Revert-fsck-add-new-l-switch-to-fsck-m.patch
+
+	# Force rebuild of .c files, necessary for gnome-ask-password-agent.c
+	for i in src/*.vala; do
+		touch "${i}"
+	done
 }
 
 src_configure() {
