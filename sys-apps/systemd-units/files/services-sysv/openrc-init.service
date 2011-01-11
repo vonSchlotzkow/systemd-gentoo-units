@@ -25,3 +25,6 @@ ExecStart=-/bin/mkdir -p /lib/rc/init.d/hotplugged
 ExecStart=-/bin/mkdir -p /lib/rc/init.d/scheduled
 ExecStart=-/bin/ln -s /etc/init.d/localmount /lib/rc/init.d/started
 ExecStart=-/bin/ln -s /etc/init.d/fsck /lib/rc/init.d/started
+
+[Install]
+WantedBy=multi-user.target
