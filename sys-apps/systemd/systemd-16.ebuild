@@ -93,10 +93,17 @@ check_mtab_is_symlink() {
 	if test ! -L "${ROOT}"etc/mtab; then
 		ewarn "${ROOT}etc/mtab must be a symlink to ${ROOT}proc/self/mounts!"
 		ewarn "To correct that, execute"
-		ewarn "  ln -sf '${ROOT}proc/self/mounts' '${ROOT}etc/mtab'"
+		ewarn "    $ ln -sf '${ROOT}proc/self/mounts' '${ROOT}etc/mtab'"
 	fi
 }
 
 pkg_postinst() {
 	check_mtab_is_symlink
+
+	# Inform user about extra configuration
+	elog "You may need to perform some additional configuration for some"
+	elog "programs to work, see the systemd manpages for loading modules and"
+	elog "handling tmpfiles:"
+	elog "    $ man modules-load.d"
+	elog "    $ man tmpfiles.d"
 }
