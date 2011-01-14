@@ -1,6 +1,6 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/wpa_supplicant/wpa_supplicant-0.7.3-r1.ebuild,v 1.1 2010/11/08 17:39:02 alexxy Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/wpa_supplicant/wpa_supplicant-0.7.3-r2.ebuild,v 1.1 2011/01/12 19:51:44 alexxy Exp $
 
 EAPI="2"
 
@@ -77,6 +77,7 @@ src_prepare() {
 	epatch "${FILESDIR}/do-not-call-dbus-functions-with-NULL-path.patch"
 
 	if use systemd; then
+		cd "${S}"
 		echo "SystemdService=dbus-fi.epitest.hostap.WPASupplicant.service" \
 			>> "dbus/fi.epitest.hostap.WPASupplicant.service" \
 			|| die "failed to patch dbus service file for systemd activation"
@@ -111,6 +112,8 @@ src_configure() {
 
 	if use dbus ; then
 		echo "CONFIG_CTRL_IFACE_DBUS=y" >> .config
+		echo "CONFIG_CTRL_IFACE_DBUS_NEW=y" >> .config
+		echo "CONFIG_CTRL_IFACE_DBUS_INTRO=y" >> .config
 	fi
 
 	if use debug ; then
@@ -245,11 +248,12 @@ src_install() {
 		insinto /etc/dbus-1/system.d
 		newins dbus-wpa_supplicant.conf wpa_supplicant.conf || die
 		insinto /usr/share/dbus-1/system-services
-		doins fi.epitest.hostap.WPASupplicant.service || die
+		doins fi.epitest.hostap.WPASupplicant.service fi.w1.wpa_supplicant1.service || die
 		keepdir /var/run/wpa_supplicant
-		if use systemd; then
-			doservices "${FILESDIR}"/wpa_supplicant.service
-		fi
+	fi
+
+	if use systemd; then
+		doservices "${FILESDIR}"/wpa_supplicant.service
 	fi
 }
 
