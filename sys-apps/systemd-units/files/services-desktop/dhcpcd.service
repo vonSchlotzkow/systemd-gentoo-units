@@ -5,4 +5,4 @@ Description=Dhcpcd
 ExecStart=/sbin/dhcpcd -q --nobackground
 
 [Install]
-WantedBy=graphical.target network.target
+network.target
