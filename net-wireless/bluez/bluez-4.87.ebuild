@@ -1,6 +1,6 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.81.ebuild,v 1.1 2010/12/10 19:51:22 pacho Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.87.ebuild,v 1.2 2011/01/28 17:06:25 mr_bones_ Exp $
 
 EAPI="3"
 
@@ -9,9 +9,12 @@ inherit multilib eutils systemd
 DESCRIPTION="Bluetooth Tools and System Daemons for Linux"
 HOMEPAGE="http://www.bluez.org/"
 
-OUIDATE="20101210" # Needed because of bug #345263
+# Because of oui.txt changing from time to time without noticement, we need to supply it
+# ourselves instead of using http://standards.ieee.org/regauth/oui/oui.txt directly.
+# See bugs #345263 and #349473 for reference.
+OUIDATE="20110128" # Needed because of bug #345263
 SRC_URI="mirror://kernel/linux/bluetooth/${P}.tar.gz
-	http://standards.ieee.org/regauth/oui/oui.txt -> oui-${OUIDATE}.txt"
+	http://dev.gentoo.org/~pacho/bluez/oui-${OUIDATE}.txt"
 LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~x86"
@@ -98,7 +101,7 @@ src_configure() {
 }
 
 src_install() {
-	emake DESTDIR="${ED}" install || die "make install failed"
+	emake DESTDIR="${D}" install || die "make install failed"
 
 	dodoc AUTHORS ChangeLog README || die
 
@@ -130,7 +133,7 @@ src_install() {
 		serial/serial.conf \
 		|| die
 
-	insinto /etc/udev/rules.d/
+	insinto /$(get_libdir)/udev/rules.d/
 	newins "${FILESDIR}/${PN}-4.18-udev.rules" 70-bluetooth.rules || die
 	exeinto /$(get_libdir)/udev/
 	newexe "${PN}-4.18-udev.script" bluetooth.sh || die
