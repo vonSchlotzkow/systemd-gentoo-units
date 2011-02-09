@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit autotools eutils gnome.org linux-info
+inherit autotools eutils gnome.org linux-info systemd
 
 # NetworkManager likes itself with capital letters
 MY_PN=${PN/networkmanager/NetworkManager}
@@ -43,7 +43,8 @@ RDEPEND=">=sys-apps/dbus-1.2
 	resolvconf? ( net-dns/openresolv )
 	connection-sharing? (
 		net-dns/dnsmasq
-		net-firewall/iptables )"
+		net-firewall/iptables )
+	systemd? ( sys-apps/systemd )"
 
 DEPEND="${RDEPEND}
 	dev-util/pkgconfig
@@ -97,6 +98,8 @@ src_prepare() {
 	epatch "${FILESDIR}/${P}-fix-timestamp.patch"
 	# fix tests wrt bug #353549
 	epatch "${FILESDIR}/${P}-fix-tests.patch"
+	# allow autodetection of openrc
+	epatch "${FILESDIR}/${P}-openrc-and-systemd.patch"
 	eautoreconf
 }
 
@@ -109,7 +112,8 @@ src_configure() {
 		--with-iptables=/sbin/iptables
 		$(use_enable doc gtk-doc)
 		$(use_with doc docs)
-		$(use_with resolvconf)"
+		$(use_with resolvconf)
+		$(use_with_systemdsystemunitdir)"
 
 	# default is dhcpcd (if none or both are specified), ISC dchclient otherwise
 	if use dhclient ; then
