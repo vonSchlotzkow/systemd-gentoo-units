@@ -1,10 +1,10 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-misc/networkmanager/networkmanager-0.8.2-r1.ebuild,v 1.1 2010/11/30 09:35:18 qiaomuf Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-misc/networkmanager/networkmanager-0.8.2-r5.ebuild,v 1.1 2011/02/06 15:06:17 qiaomuf Exp $
 
 EAPI="2"
 
-inherit gnome.org linux-info systemd
+inherit autotools eutils gnome.org linux-info
 
 # NetworkManager likes itself with capital letters
 MY_PN=${PN/networkmanager/NetworkManager}
@@ -17,7 +17,7 @@ SRC_URI="${SRC_URI//${PN}/${MY_PN}}"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~ppc ~ppc64 ~x86"
-IUSE="avahi bluetooth connection-sharing doc nss gnutls dhclient dhcpcd kernel_linux resolvconf"
+IUSE="avahi bluetooth doc nss gnutls dhclient dhcpcd kernel_linux resolvconf connection-sharing"
 
 RDEPEND=">=sys-apps/dbus-1.2
 	>=dev-libs/dbus-glib-0.75
@@ -43,8 +43,7 @@ RDEPEND=">=sys-apps/dbus-1.2
 	resolvconf? ( net-dns/openresolv )
 	connection-sharing? (
 		net-dns/dnsmasq
-		net-firewall/iptables )
-	systemd? ( sys-apps/systemd )"
+		net-firewall/iptables )"
 
 DEPEND="${RDEPEND}
 	dev-util/pkgconfig
@@ -67,6 +66,9 @@ sysfs_deprecated_check() {
 }
 
 pkg_setup() {
+	# FIXME. Required by -confchanges.patch, but the patch is invalid as
+	# ConsoleKit and PolicyKit is enough to get authorization.
+	enewgroup plugdev
 
 	if use kernel_linux; then
 		get_version
@@ -86,9 +88,16 @@ src_prepare() {
 	epatch "${FILESDIR}/${P}-confchanges.patch"
 	# accept "gw" in /etc/conf.d/net (bug #339215)
 	epatch "${FILESDIR}/${P}-accept-gw.patch"
-	epatch "${FILESDIR}/${P}-openrc-and-systemd.patch"
+	# fix shared connection wrt bug #350476
+	# fix parsing dhclient.conf wrt bug #352638
+	epatch "${FILESDIR}/${P}-shared-connection.patch"
 	# Backports #1
 	epatch "${FILESDIR}/${P}-1.patch"
+	# won't crash upon startup for 32bit machines wrt bug #353807
+	epatch "${FILESDIR}/${P}-fix-timestamp.patch"
+	# fix tests wrt bug #353549
+	epatch "${FILESDIR}/${P}-fix-tests.patch"
+	eautoreconf
 }
 
 src_configure() {
@@ -124,7 +133,7 @@ src_configure() {
 		ECONF="${ECONF} --with-crypto=nss"
 	fi
 
-	econf ${ECONF} "$(use_with_systemdsystemunitdir)"
+	econf ${ECONF}
 }
 
 src_install() {
