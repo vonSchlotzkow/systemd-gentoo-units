@@ -1,4 +1,4 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -26,6 +26,7 @@ RDEPEND="
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
+	>=sys-apps/util-linux-2.19
 	sys-apps/systemd-units
 "
 VALASLOT="0.10"
@@ -43,8 +44,6 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/0001-Revert-Revert-Revert-fsck-add-new-l-switch-to-fsck-m.patch
-
 	# Force rebuild of .c files, necessary for gnome-ask-password-agent.c
 	for i in src/*.vala; do
 		touch "${i}"
