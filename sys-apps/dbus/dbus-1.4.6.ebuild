@@ -1,10 +1,9 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-apps/dbus/dbus-1.4.1.ebuild,v 1.6 2010/12/27 12:40:23 maekke Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-apps/dbus/dbus-1.4.6.ebuild,v 1.1 2011/02/26 11:52:01 ssuominen Exp $
 
-EAPI="2"
-
-inherit autotools eutils multilib flag-o-matic virtualx systemd
+EAPI=2
+inherit autotools eutils multilib flag-o-matic virtualx
 
 DESCRIPTION="A message bus system, a simple way for applications to talk to each other"
 HOMEPAGE="http://dbus.freedesktop.org/"
@@ -12,7 +11,7 @@ SRC_URI="http://dbus.freedesktop.org/releases/dbus/${P}.tar.gz"
 
 LICENSE="|| ( GPL-2 AFL-2.1 )"
 SLOT="0"
-KEYWORDS="~alpha amd64 arm hppa ~ia64 ~mips ~ppc ppc64 ~s390 ~sh ~sparc x86 ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
 IUSE="debug doc selinux static-libs test X"
 
 CDEPEND="
@@ -26,7 +25,6 @@ CDEPEND="
 	)
 "
 RDEPEND="${CDEPEND}
-	!<sys-apps/dbus-0.91
 	>=dev-libs/expat-1.95.8
 "
 DEPEND="${CDEPEND}
@@ -49,16 +47,11 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# Delete pregenerated files from tarball wrt #337989 (testsuite fails)
-	find test/data -type f -name '*.service' -exec rm -f '{}' +
-	find test/data -type f -name 'debug-*.conf' -exec rm -f '{}' +
-
-	# Remove CFLAGS that is not supported by all gcc, bug #274456
-	sed 's/-Wno-pointer-sign//g' -i configure.in configure || die
-
 	# Tests were restricted because of this
-	sed -e 's/.*bus_dispatch_test.*/printf ("Disabled due to excess noise\\n");/' \
-		-e '/"dispatch"/d' -i "${S}/bus/test-main.c" || die
+	sed -i \
+		-e 's/.*bus_dispatch_test.*/printf ("Disabled due to excess noise\\n");/' \
+		-e '/"dispatch"/d' \
+		bus/test-main.c || die
 
 	epatch "${FILESDIR}"/${PN}-1.4.0-asneeded.patch
 
@@ -83,7 +76,6 @@ src_configure() {
 		$(use_enable selinux)
 		$(use_enable selinux libaudit)
 		$(use_enable static-libs static)
-		$(use_with_systemdsystemunitdir)
 		--enable-shared
 		--with-xml=expat
 		--with-system-pid-file=/var/run/dbus.pid
@@ -118,35 +110,34 @@ src_compile() {
 
 	cd "${BD}"
 	einfo "Running make in ${BD}"
-	emake || die "make failed"
+	emake || die
 
 	if use doc; then
-		einfo "Building API documentation..."
-		doxygen || die "doxygen failed"
+		doxygen || die
 	fi
 
 	if use test; then
 		cd "${TBD}"
 		einfo "Running make in ${TBD}"
-		emake || die "make failed"
+		emake || die
 	fi
 }
 
 src_test() {
 	cd "${TBD}"
-	DBUS_VERBOSE=1 Xmake check || die "make check failed"
+	DBUS_VERBOSE=1 Xemake -j1 check || die
 }
 
 src_install() {
 	# initscript
-	newinitd "${FILESDIR}"/dbus.init-1.0 dbus || die "newinitd failed"
+	newinitd "${FILESDIR}"/dbus.init-1.0 dbus || die
 
 	if use X ; then
 		# dbus X session script (#77504)
 		# turns out to only work for GDM (and startx). has been merged into
 		# other desktop (kdm and such scripts)
 		exeinto /etc/X11/xinit/xinitrc.d/
-		doexe "${FILESDIR}"/80-dbus || die "doexe failed"
+		doexe "${FILESDIR}"/80-dbus || die
 	fi
 
 	# needs to exist for the system socket
@@ -160,19 +151,19 @@ src_install() {
 	keepdir /etc/dbus-1/system.d/
 	keepdir /etc/dbus-1/session.d/
 
-	dodoc AUTHORS ChangeLog HACKING NEWS README doc/TODO || die "dodoc failed"
+	dodoc AUTHORS ChangeLog HACKING NEWS README doc/TODO || die
 
 	cd "${BD}"
 	# FIXME: split dtd's in dbus-dtd ebuild
-	emake DESTDIR="${D}" install || die "make install failed"
+	emake DESTDIR="${D}" install || die
 	if use doc; then
-		dohtml -p api/ doc/api/html/* || die "dohtml api failed"
+		dohtml -p api/ doc/api/html/* || die
 		cd "${S}"
-		dohtml doc/*.html || die "dohtml failed"
+		dohtml doc/*.html || die
 	fi
 
 	# Remove .la files
-	find "${D}" -type f -name '*.la' -exec rm -f '{}' +
+	find "${D}" -type f -name '*.la' -exec rm -f {} +
 }
 
 pkg_postinst() {
