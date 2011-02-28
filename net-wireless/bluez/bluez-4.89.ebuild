@@ -4,7 +4,7 @@
 
 EAPI="3"
 
-inherit multilib eutils
+inherit multilib eutils systemd
 
 DESCRIPTION="Bluetooth Tools and System Daemons for Linux"
 HOMEPAGE="http://www.bluez.org/"
@@ -61,6 +61,11 @@ src_prepare() {
 	if use cups; then
 		sed -i -e "s:cupsdir = \$(libdir)/cups:cupsdir = `cups-config --serverbin`:" \
 			Makefile.tools Makefile.in || die
+	fi
+
+	cp "${FILESDIR}/${PN}-4.18-udev.script" "${S}" || die
+	if use systemd; then
+		epatch "${FILESDIR}/${PN}-4.18-udev-systemd.patch" || die
 	fi
 }
 
@@ -131,7 +136,7 @@ src_install() {
 	insinto /$(get_libdir)/udev/rules.d/
 	newins "${FILESDIR}/${PN}-4.18-udev.rules" 70-bluetooth.rules || die
 	exeinto /$(get_libdir)/udev/
-	newexe "${FILESDIR}/${PN}-4.18-udev.script" bluetooth.sh || die
+	newexe "${PN}-4.18-udev.script" bluetooth.sh || die
 
 	newinitd "${FILESDIR}/bluetooth-init.d" bluetooth || die
 	newconfd "${FILESDIR}/4.60/bluetooth-conf.d" bluetooth || die
@@ -139,6 +144,10 @@ src_install() {
 	# Install oui.txt as requested in bug #283791 and approved by upstream
 	insinto /var/lib/misc
 	newins "${DISTDIR}/oui-${OUIDATE}.txt" oui.txt || die
+
+	if use systemd; then
+		doservices "${FILESDIR}"/bluetooth.service
+	fi
 
 	find "${ED}" -name "*.la" -delete || die "remove of la files failed"
 }
