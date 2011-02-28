@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-misc/networkmanager/networkmanager-0.8.2-r6.ebuild,v 1.1 2011/02/08 13:31:01 dagger Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-misc/networkmanager/networkmanager-0.8.2-r9.ebuild,v 1.1 2011/02/26 08:13:31 qiaomuf Exp $
 
 EAPI="2"
 
@@ -100,7 +100,9 @@ src_prepare() {
 	epatch "${FILESDIR}/${P}-fix-tests.patch"
 	# fix temporary files creation bug #349003
 	epatch "${FILESDIR}/${P}-fix-tempfiles.patch"
-	# allow autodetection of openrc
+	# won't write when nothing changed (bug #356339)
+	epatch "${FILESDIR}/${P}-ifnet-smarter-write.patch"
+	# allow autodetection of openrc and systemd
 	epatch "${FILESDIR}/${P}-openrc-and-systemd.patch"
 	eautoreconf
 }
