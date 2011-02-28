@@ -8,7 +8,7 @@ PYTHON_DEPEND="python? 2"
 PYTHON_USE_WITH="gdbm"
 PYTHON_USE_WITH_OPT="python"
 
-inherit eutils mono python multilib flag-o-matic
+inherit eutils mono python multilib flag-o-matic systemd
 
 DESCRIPTION="System which facilitates service discovery on a local network"
 HOMEPAGE="http://avahi.org/"
@@ -146,6 +146,7 @@ src_configure() {
 		--disable-qt3 \
 		$(use_enable qt4) \
 		$(use_enable gdbm) \
+		$(use_with_systemdsystemunitdir) \
 		${myconf}
 }
 
