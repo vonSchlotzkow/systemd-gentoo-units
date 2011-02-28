@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/sys-apps/dbus/dbus-1.4.6.ebuild,v 1.1 2011/02/26 11:52:01 ssuominen Exp $
 
 EAPI=2
-inherit autotools eutils multilib flag-o-matic virtualx
+inherit autotools eutils multilib flag-o-matic virtualx systemd
 
 DESCRIPTION="A message bus system, a simple way for applications to talk to each other"
 HOMEPAGE="http://dbus.freedesktop.org/"
@@ -76,6 +76,7 @@ src_configure() {
 		$(use_enable selinux)
 		$(use_enable selinux libaudit)
 		$(use_enable static-libs static)
+		$(use_with_systemdsystemunitdir)
 		--enable-shared
 		--with-xml=expat
 		--with-system-pid-file=/var/run/dbus.pid
