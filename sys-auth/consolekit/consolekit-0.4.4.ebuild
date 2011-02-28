@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/sys-auth/consolekit/consolekit-0.4.4.ebuild,v 1.1 2011/02/26 11:05:20 ssuominen Exp $
 
 EAPI=3
-inherit autotools eutils linux-info multilib pam
+inherit autotools eutils linux-info multilib pam systemd
 
 MY_PN=ConsoleKit
 MY_P=${MY_PN}-${PV}
@@ -57,6 +57,7 @@ src_configure() {
 		$(use_enable doc docbook-docs) \
 		$(use_enable debug) \
 		$(use_enable policykit polkit) \
+		$(use_with_systemdsystemunitdir) \
 		--with-dbus-services="${EPREFIX}"/usr/share/dbus-1/services \
 		--with-pam-module-dir=$(getpam_mod_dir)
 }
