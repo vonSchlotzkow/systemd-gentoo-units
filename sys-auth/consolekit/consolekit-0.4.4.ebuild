@@ -1,9 +1,9 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-auth/consolekit/consolekit-0.4.3.ebuild,v 1.1 2010/11/25 17:47:28 ssuominen Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-auth/consolekit/consolekit-0.4.4.ebuild,v 1.1 2011/02/26 11:05:20 ssuominen Exp $
 
 EAPI=3
-inherit autotools eutils linux-info multilib pam systemd
+inherit autotools eutils linux-info multilib pam
 
 MY_PN=ConsoleKit
 MY_P=${MY_PN}-${PV}
@@ -17,14 +17,12 @@ SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd ~x86-freebsd ~amd64-linux ~ia64-linux ~x86-linux"
 IUSE="debug doc kernel_linux pam policykit test"
 
-RDEPEND=">=dev-libs/dbus-glib-0.82
+RDEPEND=">=dev-libs/dbus-glib-0.88
 	>=dev-libs/glib-2.20:2
 	sys-libs/zlib
 	x11-libs/libX11
 	pam? ( virtual/pam )
-	policykit? ( >=sys-auth/polkit-0.96 )
-	!<sys-apps/shadow-4.1.4.2-r6
-	!<sys-auth/pambase-20101024"
+	policykit? ( >=sys-auth/polkit-0.96-r1 )"
 DEPEND="${RDEPEND}
 	dev-util/pkgconfig
 	dev-libs/libxslt
@@ -34,7 +32,8 @@ DEPEND="${RDEPEND}
 S=${WORKDIR}/${MY_P}
 
 pkg_setup() {
-	if use kernel_linux; then
+	# This is required to get login-session-id string with pam_ck_connector.so
+	if use pam && use kernel_linux; then
 		CONFIG_CHECK="~AUDITSYSCALL"
 		linux-info_pkg_setup
 	fi
@@ -45,8 +44,7 @@ src_prepare() {
 		"${FILESDIR}"/${PN}-0.2.10-cleanup_console_tags.patch \
 		"${FILESDIR}"/${PN}-0.4.0-polkit-automagic.patch \
 		"${FILESDIR}"/${PN}-0.4.0-multilib.patch \
-		"${FILESDIR}"/${PN}-0.4.1-shutdown-reboot-without-policies.patch \
-		"${FILESDIR}"/consolekit-0.4.3-systemd-fix-name-of-unit.patch
+		"${FILESDIR}"/${PN}-0.4.1-shutdown-reboot-without-policies.patch
 
 	eautoreconf
 }
@@ -59,7 +57,6 @@ src_configure() {
 		$(use_enable doc docbook-docs) \
 		$(use_enable debug) \
 		$(use_enable policykit polkit) \
-		"$(use_with_systemdsystemunitdir)" \
 		--with-dbus-services="${EPREFIX}"/usr/share/dbus-1/services \
 		--with-pam-module-dir=$(getpam_mod_dir)
 }
@@ -85,11 +82,10 @@ src_install() {
 	exeinto /usr/$(get_libdir)/ConsoleKit/run-session.d
 	doexe "${FILESDIR}"/pam-foreground-compat.ck || die
 
-	find "${ED}" -name '*.la' -exec rm -f '{}' +
+	find "${ED}" -name '*.la' -exec rm -f {} +
 }
 
 pkg_postinst() {
-	ewarn
 	ewarn "You need to restart ConsoleKit to get the new features."
 	ewarn "This can be done with /etc/init.d/consolekit restart"
 	ewarn "but make sure you do this and then restart your session"
