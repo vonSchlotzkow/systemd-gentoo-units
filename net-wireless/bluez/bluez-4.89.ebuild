@@ -1,10 +1,10 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.87.ebuild,v 1.2 2011/01/28 17:06:25 mr_bones_ Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.89.ebuild,v 1.2 2011/02/26 12:31:44 ssuominen Exp $
 
 EAPI="3"
 
-inherit multilib eutils systemd
+inherit multilib eutils
 
 DESCRIPTION="Bluetooth Tools and System Daemons for Linux"
 HOMEPAGE="http://www.bluez.org/"
@@ -12,7 +12,7 @@ HOMEPAGE="http://www.bluez.org/"
 # Because of oui.txt changing from time to time without noticement, we need to supply it
 # ourselves instead of using http://standards.ieee.org/regauth/oui/oui.txt directly.
 # See bugs #345263 and #349473 for reference.
-OUIDATE="20110128" # Needed because of bug #345263
+OUIDATE="20110221" # Needed because of bug #345263
 SRC_URI="mirror://kernel/linux/bluetooth/${P}.tar.gz
 	http://dev.gentoo.org/~pacho/bluez/oui-${OUIDATE}.txt"
 LICENSE="GPL-2 LGPL-2.1"
@@ -31,7 +31,7 @@ CDEPEND="alsa? (
 	usb? ( dev-libs/libusb )
 	cups? ( net-print/cups )
 	>=sys-fs/udev-146[extras]
-	>=dev-libs/glib-2.14
+	>=dev-libs/glib-2.14:2
 	sys-apps/dbus
 	media-libs/libsndfile
 	>=dev-libs/libnl-1.1
@@ -41,7 +41,7 @@ DEPEND="sys-devel/flex
 	>=dev-util/pkgconfig-0.20
 	${CDEPEND}"
 RDEPEND="${CDEPEND}
-	consolekit? ( sys-auth/pambase[consolekit] )
+	consolekit? ( sys-auth/consolekit )
 	test-programs? (
 		dev-python/dbus-python
 		dev-python/pygobject )"
@@ -61,11 +61,6 @@ src_prepare() {
 	if use cups; then
 		sed -i -e "s:cupsdir = \$(libdir)/cups:cupsdir = `cups-config --serverbin`:" \
 			Makefile.tools Makefile.in || die
-	fi
-
-	cp "${FILESDIR}/${PN}-4.18-udev.script" "${S}" || die
-	if use systemd; then
-		epatch "${FILESDIR}/${PN}-4.18-udev-systemd.patch" || die
 	fi
 }
 
@@ -136,7 +131,7 @@ src_install() {
 	insinto /$(get_libdir)/udev/rules.d/
 	newins "${FILESDIR}/${PN}-4.18-udev.rules" 70-bluetooth.rules || die
 	exeinto /$(get_libdir)/udev/
-	newexe "${PN}-4.18-udev.script" bluetooth.sh || die
+	newexe "${FILESDIR}/${PN}-4.18-udev.script" bluetooth.sh || die
 
 	newinitd "${FILESDIR}/bluetooth-init.d" bluetooth || die
 	newconfd "${FILESDIR}/4.60/bluetooth-conf.d" bluetooth || die
@@ -144,10 +139,6 @@ src_install() {
 	# Install oui.txt as requested in bug #283791 and approved by upstream
 	insinto /var/lib/misc
 	newins "${DISTDIR}/oui-${OUIDATE}.txt" oui.txt || die
-
-	if use systemd; then
-		doservices "${FILESDIR}"/bluetooth.service
-	fi
 
 	find "${ED}" -name "*.la" -delete || die "remove of la files failed"
 }
