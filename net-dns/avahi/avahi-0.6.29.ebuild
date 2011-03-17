@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-dns/avahi/avahi-0.6.28-r1.ebuild,v 1.1 2011/02/27 01:24:33 swegener Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-dns/avahi/avahi-0.6.29.ebuild,v 1.1 2011/03/17 07:11:30 swegener Exp $
 
 EAPI="3"
 
@@ -92,9 +92,6 @@ src_prepare() {
 	sed -i\
 		-e "s:\\.\\./\\.\\./\\.\\./doc/avahi-docs/html/:../../../doc/${PF}/html/:" \
 		doxygen_to_devhelp.xsl || die
-
-	epatch "${FILESDIR}"/netlink-request-all-matches-when-requesting-interface.patch
-	epatch "${FILESDIR}"/${P}-CVE-2011-1002.patch
 }
 
 src_configure() {
@@ -182,11 +179,11 @@ src_install() {
 }
 
 pkg_postrm() {
-	use python && python_mod_cleanup avahi avahi_discover
+	use python && python_mod_cleanup avahi $(use dbus && use gtk && echo avahi_discover)
 }
 
 pkg_postinst() {
-	use python && python_mod_optimize avahi avahi_discover
+	use python && python_mod_optimize avahi $(use dbus && use gtk && echo avahi_discover)
 
 	if use autoipd; then
 		echo
