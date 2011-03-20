@@ -21,6 +21,15 @@ doservices() {
 	done
 }
 
+# dotmpfiles: install systemd tmpfile files. Usage is 'dotmpfiles files....'.
+dotmpfiles() {
+	[[ -z "${1}" ]] && die "usage: dotmpfiles <files...>"
+	insinto "/etc/tmpfiles.d"
+	for i in "$@" ; do
+		doins "$i" || die "dotmpfiles failed to install '$i'"
+	done
+}
+
 # use_with_systemdsystemunitdir: Echo configure option depending on systemd
 # USE flag.
 use_with_systemdsystemunitdir() {

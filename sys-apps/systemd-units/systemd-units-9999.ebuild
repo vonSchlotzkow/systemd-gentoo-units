@@ -29,6 +29,7 @@ src_install() {
 
 	if use server; then
 		doservices "${FILESDIR}"/services-server/*
+		dotmpfiles "${FILESDIR}"/tmpfiles-server/*
 	fi
 
 	if use desktop; then
