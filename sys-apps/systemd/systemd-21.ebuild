@@ -4,12 +4,11 @@
 
 EAPI=3
 
-inherit autotools git linux-info pam
+inherit linux-info pam
 
 DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
-EGIT_REPO_URI="git://anongit.freedesktop.org/systemd"
-EGIT_BRANCH="master"
+SRC_URI="http://www.freedesktop.org/software/systemd/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -30,6 +29,7 @@ RDEPEND="
 	>=sys-apps/util-linux-2.19
 	sys-apps/systemd-units
 "
+# Vala-0.10 doesn't work with libnotify 0.7.1
 VALASLOT="0.12"
 DEPEND="${RDEPEND}
 	gtk? ( dev-lang/vala:$VALASLOT )
@@ -45,7 +45,10 @@ pkg_setup() {
 }
 
 src_prepare() {
-	eautoreconf
+	# Force rebuild of .c files, necessary for gnome-ask-password-agent.c
+	for i in src/*.vala; do
+		touch "${i}"
+	done
 }
 
 src_configure() {
