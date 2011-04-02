@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-164-r2.ebuild,v 1.1 2011/03/19 11:06:20 zzam Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-167.ebuild,v 1.1 2011/03/30 19:06:57 zzam Exp $
 
 EAPI="1"
 
@@ -146,10 +146,11 @@ src_unpack() {
 		fi
 	fi
 
+	#cd "${WORKDIR}/${scriptname}"
+
 	cd "${S}"
 
 	# patches go here...
-	epatch "${FILESDIR}"/udev-164-remove-v4l1.patch
 
 	# backport some patches
 	if [[ -n "${PATCHSET}" ]]; then
@@ -167,7 +168,7 @@ src_unpack() {
 		# (more for my own needs than anything else ...)
 		MD5=$(md5sum < "${S}/rules/rules.d/50-udev-default.rules")
 		MD5=${MD5/  -/}
-		if [[ ${MD5} != f3c9ade42f70cec0459f9e58a99c632a ]]
+		if [[ ${MD5} != a9954d57e97aa0ad2e0ed53899d9559a ]]
 		then
 			echo
 			eerror "50-udev-default.rules has been updated, please validate!"
@@ -207,7 +208,7 @@ src_compile() {
 		--enable-static \
 		$(use_with selinux) \
 		$(use_enable extras) \
-		"$(use_with_systemdsystemunitdir)" \
+		$(use_with_systemdsystemunitdir) \
 		--disable-introspection
 	# we don't have gobject-introspection in portage tree
 
