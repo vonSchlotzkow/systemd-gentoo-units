@@ -1,16 +1,17 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-167.ebuild,v 1.1 2011/03/30 19:06:57 zzam Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-167-r1.ebuild,v 1.3 2011/04/03 19:33:14 zzam Exp $
 
 EAPI="1"
 
-inherit eutils flag-o-matic multilib toolchain-funcs linux-info systemd
+inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools systemd
 
 #PATCHSET=${P}-gentoo-patchset-v1
 scriptversion=164-v2
 scriptname=${PN}-gentoo-scripts-${scriptversion}
 
 if [[ ${PV} == "9999" ]]; then
+	SRC_URI="mirror://gentoo/${scriptname}.tar.bz2"
 	EGIT_REPO_URI="git://git.kernel.org/pub/scm/linux/hotplug/udev.git"
 	EGIT_BRANCH="master"
 	inherit git autotools
@@ -93,7 +94,7 @@ pkg_setup() {
 	# new signalfd syscall introduced in kernel 2.6.27 without falling back
 	# to the old one. So we just depend on 2.6.27 here, see Bug #281312.
 	KV_PATCH_min=25
-	KV_PATCH_reliable=27
+	KV_PATCH_reliable=31
 	KV_min=2.6.${KV_PATCH_min}
 	KV_reliable=2.6.${KV_PATCH_reliable}
 
@@ -136,11 +137,10 @@ sed_libexec_dir() {
 }
 
 src_unpack() {
+	unpack ${A}
 	if [[ ${PV} == "9999" ]] ; then
 		git_src_unpack
 	else
-		unpack ${A}
-
 		if use test; then
 			mv "${WORKDIR}"/test/sys "${S}"/test/
 		fi
@@ -151,11 +151,12 @@ src_unpack() {
 	cd "${S}"
 
 	# patches go here...
+	epatch "${FILESDIR}/udev-167-revert-disable-all-extras.patch"
 
 	# backport some patches
 	if [[ -n "${PATCHSET}" ]]; then
 		EPATCH_SOURCE="${WORKDIR}/${PATCHSET}" EPATCH_SUFFIX="patch" \
-	  	      EPATCH_FORCE="yes" epatch
+			  EPATCH_FORCE="yes" epatch
 	fi
 
 	# change rules back to group uucp instead of dialout for now
@@ -184,9 +185,9 @@ src_unpack() {
 		|| die "sed failed"
 
 	if [[ ${PV} == 9999 ]]; then
-		gtkdocize --copy
-		eautoreconf
+		gtkdocize --copy || die "gtkdocize failed"
 	fi
+	eautoreconf
 
 	cd "${WORKDIR}/${scriptname}"
 	sed_libexec_dir \
@@ -290,7 +291,7 @@ pkg_preinst() {
 	fi
 
 	if [[ -f ${ROOT}/etc/udev/udev.config &&
-	     ! -f ${ROOT}/etc/udev/udev.rules ]]
+		 ! -f ${ROOT}/etc/udev/udev.rules ]]
 	then
 		mv -f "${ROOT}"/etc/udev/udev.config "${ROOT}"/etc/udev/udev.rules
 	fi
