@@ -89,7 +89,6 @@ src_configure() {
 		--with-system-socket=/var/run/dbus/system_bus_socket
 		--with-session-socket-dir=/tmp
 		--with-dbus-user=messagebus
-		--without-systemdsystemunitdir
 		--localstatedir=/var"
 
 	mkdir "${BD}"
