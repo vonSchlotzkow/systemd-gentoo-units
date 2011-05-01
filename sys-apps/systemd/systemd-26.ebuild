@@ -16,7 +16,8 @@ KEYWORDS="~amd64 ~x86"
 IUSE="audit gtk pam +tcpwrap sysv selinux"
 
 RDEPEND="
-	>=sys-apps/dbus-1.4.0[systemd]
+	|| (	>=sys-apps/dbus-1.4.0[systemd]
+			>=sys-apps/systemd-dbus-1.4.0 )
 	sys-libs/libcap
 	>=sys-fs/udev-163[systemd]
 	audit? ( sys-process/audit )
