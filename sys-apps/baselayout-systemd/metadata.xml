@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<herd>no-herd</herd>
+	<maintainer>
+		<email>hsggebhardt@googlemail.com</email>
+		<name>Henry Gebhardt</name>
+	</maintainer>
+<longdescription lang="en">
+Provides some configuration files for systemd. With the guess use-flag the ebuild tries to get the correct configuration from the files in /etc/conf.d/.
+</longdescription>
+<use>
+	<flag name="guess">Try to guess the configuration if it not already exists</flag>
+</use>
+</pkgmetadata>
+
