@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-inherit multilib eutils systemd
+inherit multilib eutils systemd-local
 
 DESCRIPTION="Bluetooth Tools and System Daemons for Linux"
 HOMEPAGE="http://www.bluez.org/"

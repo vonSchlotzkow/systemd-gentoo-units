@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/sys-apps/dbus/dbus-1.4.8.ebuild,v 1.2 2011/04/26 16:13:24 ssuominen Exp $
 
 EAPI=2
-inherit autotools eutils multilib flag-o-matic python virtualx systemd
+inherit autotools eutils multilib flag-o-matic python virtualx systemd-local
 
 DESCRIPTION="A message bus system, a simple way for applications to talk to each other"
 HOMEPAGE="http://dbus.freedesktop.org/"

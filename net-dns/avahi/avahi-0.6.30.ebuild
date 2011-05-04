@@ -8,7 +8,7 @@ PYTHON_DEPEND="python? 2"
 PYTHON_USE_WITH="gdbm"
 PYTHON_USE_WITH_OPT="python"
 
-inherit eutils mono python multilib flag-o-matic systemd
+inherit eutils mono python multilib flag-o-matic systemd-local
 
 DESCRIPTION="System which facilitates service discovery on a local network"
 HOMEPAGE="http://avahi.org/"

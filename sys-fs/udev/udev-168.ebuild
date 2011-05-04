@@ -4,7 +4,8 @@
 
 EAPI="1"
 
-inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools systemd
+inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools
+systemd-local
 
 #PATCHSET=${P}-gentoo-patchset-v1
 scriptversion=164-v2

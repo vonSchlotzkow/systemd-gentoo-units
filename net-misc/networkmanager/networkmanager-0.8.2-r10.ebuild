@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit autotools eutils gnome.org linux-info systemd
+inherit autotools eutils gnome.org linux-info systemd-local
 
 # NetworkManager likes itself with capital letters
 MY_PN=${PN/networkmanager/NetworkManager}

@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/sys-auth/consolekit/consolekit-0.4.4.ebuild,v 1.1 2011/02/26 11:05:20 ssuominen Exp $
 
 EAPI=3
-inherit autotools eutils linux-info multilib pam systemd
+inherit autotools eutils linux-info multilib pam systemd-local
 
 MY_PN=ConsoleKit
 MY_P=${MY_PN}-${PV}
