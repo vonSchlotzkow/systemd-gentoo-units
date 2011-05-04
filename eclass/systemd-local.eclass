@@ -10,12 +10,14 @@
 # hsggebhardt@googlemail.com.
 #
 
+inherit systemd
+
 IUSE="systemd"
 
 # doservices: install systemd .service files. Usage is 'doservices files....'.
 doservices() {
 	[[ -z "${1}" ]] && die "usage: doservices <files...>"
-	insinto "/lib/systemd/system"
+	insinto "$(systemd_get_unitdir)"
 	for i in "$@" ; do
 		doins "$i" || die "doservices failed to install '$i'"
 	done
@@ -34,8 +36,8 @@ dotmpfiles() {
 # USE flag.
 use_with_systemdsystemunitdir() {
 	if use systemd; then
-		echo "--with-systemdsystemunitdir=/lib/systemd/system"
+		echo -n "--with-systemdsystemunitdir=$(systemd_get_unitdir)"
 	else
-		echo "--without-systemdsystemunitdir"
+		echo -n "--without-systemdsystemunitdir"
 	fi
 }
