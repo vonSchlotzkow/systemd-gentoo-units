@@ -1,11 +1,10 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-168.ebuild,v 1.1 2011/04/30 12:29:14 zzam Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-168-r1.ebuild,v 1.1 2011/04/30 20:07:08 zzam Exp $
 
 EAPI="1"
 
-inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools
-systemd-local
+inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools systemd-local
 
 #PATCHSET=${P}-gentoo-patchset-v1
 scriptversion=164-v2
@@ -138,7 +137,10 @@ src_unpack() {
 		fi
 	fi
 
-	#cd "${WORKDIR}/${scriptname}"
+	cd "${WORKDIR}/${scriptname}"
+
+	sed -e '/^LIBEXECDIR/s-$(LIBDIR)-lib-' -i Makefile \
+		|| die "patching Makefile failed"
 
 	cd "${S}"
 
@@ -203,8 +205,8 @@ src_install() {
 		install || die "make install failed"
 
 	if ! use openrc; then
-		rm "${D}/$(get_libdir)/udev/rules.d/90-network.rules" || die
-		rm "${D}/$(get_libdir)/udev/net.sh" || die
+		rm "${D}/lib/udev/rules.d/90-network.rules" || die
+		rm "${D}/lib/udev/net.sh" || die
 	fi
 
 	into /
