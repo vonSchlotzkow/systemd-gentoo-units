@@ -13,7 +13,7 @@ SRC_URI="http://www.freedesktop.org/software/systemd/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="audit gtk pam selinux sysv +tcpwrap"
+IUSE="audit gtk pam plymouth selinux sysv +tcpwrap"
 
 COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	sys-libs/libcap
@@ -27,7 +27,8 @@ COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
 	tcpwrap? ( sys-apps/tcp-wrappers )
-	>=sys-apps/util-linux-2.19"
+	>=sys-apps/util-linux-2.19
+	plymouth? ( sys-boot/plymouth )"
 
 # Vala-0.10 doesn't work with libnotify 0.7.1
 VALASLOT="0.12"
@@ -101,6 +102,8 @@ src_configure() {
 	if use gtk; then
 		export VALAC="$(type -p valac-${VALASLOT})"
 	fi
+
+	use plymouth && export have_plymouth=1
 
 	econf ${myconf}
 }
