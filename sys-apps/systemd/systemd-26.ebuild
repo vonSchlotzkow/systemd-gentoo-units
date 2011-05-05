@@ -17,9 +17,7 @@ IUSE="audit gtk pam +tcpwrap sysv selinux"
 
 
 
-COMMON_DEPEND="
-	|| (	>=sys-apps/dbus-1.4.0[systemd]
-			>=sys-apps/systemd-dbus-1.4.0 )
+COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	sys-libs/libcap
 	>=sys-fs/udev-163[systemd]
 	audit? ( sys-process/audit )
