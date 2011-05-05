@@ -15,8 +15,6 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="audit gtk pam +tcpwrap sysv selinux"
 
-
-
 COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	sys-libs/libcap
 	>=sys-fs/udev-163[systemd]
