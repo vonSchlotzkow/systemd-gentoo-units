@@ -4,7 +4,7 @@
 
 EAPI="1"
 
-inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools systemd-local
+inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools systemd
 
 #PATCHSET=${P}-gentoo-patchset-v1
 scriptversion=164-v2
@@ -192,7 +192,7 @@ src_compile() {
 		$(use_with selinux) \
 		$(use_enable extras) \
 		--disable-introspection \
-		$(use_with_systemdsystemunitdir)
+		"$(systemd_with_unitdir)"
 	# we don't have gobject-introspection in portage tree
 
 	emake || die "compiling udev failed"
