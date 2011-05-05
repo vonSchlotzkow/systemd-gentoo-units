@@ -28,7 +28,7 @@ HOMEPAGE="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
-IUSE="selinux extras +openrc test"
+IUSE="selinux extras +openrc systemd test"
 
 COMMON_DEPEND="selinux? ( sys-libs/libselinux )
 	extras? (
@@ -192,7 +192,7 @@ src_compile() {
 		$(use_with selinux) \
 		$(use_enable extras) \
 		--disable-introspection \
-		"$(systemd_with_unitdir)"
+		"$(use systemd && systemd_with_unitdir)"
 	# we don't have gobject-introspection in portage tree
 
 	emake || die "compiling udev failed"
