@@ -1,10 +1,10 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.91.ebuild,v 1.3 2011/05/01 15:55:38 ssuominen Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.93.ebuild,v 1.1 2011/05/05 17:38:47 pacho Exp $
 
 EAPI="4"
 
-inherit multilib eutils systemd-local
+inherit multilib eutils systemd
 
 DESCRIPTION="Bluetooth Tools and System Daemons for Linux"
 HOMEPAGE="http://www.bluez.org/"
@@ -12,14 +12,14 @@ HOMEPAGE="http://www.bluez.org/"
 # Because of oui.txt changing from time to time without noticement, we need to supply it
 # ourselves instead of using http://standards.ieee.org/regauth/oui/oui.txt directly.
 # See bugs #345263 and #349473 for reference.
-OUIDATE="20110330"
+OUIDATE="20110505"
 SRC_URI="mirror://kernel/linux/bluetooth/${P}.tar.gz
-	http://dev.gentoo.org/~pacho/bluez/oui-${OUIDATE}.txt"
+	http://dev.gentoo.org/~pacho/bluez/oui-${OUIDATE}.txt.xz"
 LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~x86"
 
-IUSE="alsa attrib caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat test-programs usb"
+IUSE="alsa caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat systemd test-programs usb"
 
 CDEPEND="
 	>=dev-libs/glib-2.14:2
@@ -45,6 +45,7 @@ RDEPEND="${CDEPEND}
 	!net-wireless/bluez-libs
 	!net-wireless/bluez-utils
 	consolekit? ( sys-auth/consolekit )
+	consolekit? ( systemd? ( >=sys-auth/consolekit-0.4.4-r1 ) )
 	test-programs? (
 		dev-python/dbus-python
 		dev-python/pygobject:2
@@ -94,7 +95,6 @@ src_configure() {
 		$(use_enable old-daemons hidd) \
 		$(use_enable old-daemons pand) \
 		$(use_enable old-daemons dund) \
-		$(use_enable attrib) \
 		$(use_enable health) \
 		$(use_enable pnat) \
 		$(use_enable maemo6) \
@@ -149,10 +149,10 @@ src_install() {
 
 	# Install oui.txt as requested in bug #283791 and approved by upstream
 	insinto /var/lib/misc
-	newins "${DISTDIR}/oui-${OUIDATE}.txt" oui.txt
+	newins "${WORKDIR}/oui-${OUIDATE}.txt" oui.txt
 
 	if use systemd; then
-		doservices "${FILESDIR}"/bluetooth.service
+		systemd_dounit "${FILESDIR}"/bluetooth.service
 	fi
 
 	find "${ED}" -name "*.la" -delete
