@@ -39,9 +39,26 @@ DEPEND="${COMMON_DEPEND}
 	gtk? ( dev-lang/vala:${VALASLOT} )
 	>=sys-kernel/linux-headers-${MINKV}"
 
+check_no_uevent_hotplug_helper() {
+	local path
+	if linux_config_exists; then
+		path="$(linux_chkconfig_string UEVENT_HELPER_PATH)"
+		path="${path#\"}"
+		path="${path%\"}"
+		path="${path#\'}"
+		path="${path%\'}"
+		if test "${path}" != ""; then
+			qewarn "The kernel should be configured with"
+			qewarn "CONFIG_UEVENT_HELPER_PATH=\"\". Also, be sure to check"
+			qewarn "that /proc/sys/kernel/hotplug is empty."
+		fi
+	fi
+}
+
 pkg_pretend() {
 	local CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY ~IPV6"
 	linux-info_pkg_setup
+	check_no_uevent_hotplug_helper
 	kernel_is -ge ${MINKV//./ } || die "Kernel version at least ${MINKV} required"
 }
 
