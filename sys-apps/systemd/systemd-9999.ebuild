@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=3
+EAPI=4
 
 inherit autotools git linux-info pam
 
@@ -14,7 +14,7 @@ EGIT_BRANCH="master"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="audit gtk pam +tcpwrap sysv selinux"
+IUSE="audit gtk pam selinux sysv +tcpwrap"
 
 COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	sys-libs/libcap
@@ -30,6 +30,7 @@ COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	>=sys-apps/util-linux-2.19"
 
+# Vala-0.10 doesn't work with libnotify 0.7.1
 VALASLOT="0.12"
 MINKV="2.6.38"
 
@@ -39,10 +40,30 @@ DEPEND="${COMMON_DEPEND}
 	gtk? ( dev-lang/vala:${VALASLOT} )
 	>=sys-kernel/linux-headers-${MINKV}"
 
-CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY ~IPV6"
+check_no_uevent_hotplug_helper() {
+	local path
+	if linux_config_exists; then
+		path="$(linux_chkconfig_string UEVENT_HELPER_PATH)"
+		path="${path#\"}"
+		path="${path%\"}"
+		path="${path#\'}"
+		path="${path%\'}"
+		if test "${path}" != ""; then
+			qewarn "The kernel should be configured with"
+			qewarn "CONFIG_UEVENT_HELPER_PATH=\"\". Also, be sure to check"
+			qewarn "that /proc/sys/kernel/hotplug is empty."
+		fi
+	fi
+}
+
+pkg_pretend() {
+	local CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY ~IPV6"
+	linux-info_pkg_setup
+	check_no_uevent_hotplug_helper
+	kernel_is -ge ${MINKV//./ } || die "Kernel version at least ${MINKV} required"
+}
 
 pkg_setup() {
-	linux-info_pkg_setup
 	enewgroup lock # used by var-lock.mount
 	enewgroup tty 5 # used by mount-setup for /dev/pts
 }
