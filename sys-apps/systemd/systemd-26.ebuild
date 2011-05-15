@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=3
+EAPI=4
 
 inherit linux-info pam
 
@@ -13,7 +13,7 @@ SRC_URI="http://www.freedesktop.org/software/systemd/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="audit gtk pam +tcpwrap sysv selinux"
+IUSE="audit gtk pam selinux sysv +tcpwrap"
 
 COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	sys-libs/libcap
@@ -39,10 +39,13 @@ DEPEND="${COMMON_DEPEND}
 	gtk? ( dev-lang/vala:${VALASLOT} )
 	>=sys-kernel/linux-headers-${MINKV}"
 
-CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY ~IPV6"
+pkg_pretend() {
+	local CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY ~IPV6"
+	linux-info_pkg_setup
+	kernel_is -ge ${MINKV//./ } || die "Kernel version at least ${MINKV} required"
+}
 
 pkg_setup() {
-	linux-info_pkg_setup
 	enewgroup lock # used by var-lock.mount
 	enewgroup tty 5 # used by mount-setup for /dev/pts
 }
