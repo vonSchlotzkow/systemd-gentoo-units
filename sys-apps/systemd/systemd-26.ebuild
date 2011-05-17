@@ -28,7 +28,7 @@ COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	selinux? ( sys-libs/libselinux )
 	tcpwrap? ( sys-apps/tcp-wrappers )
 	>=sys-apps/util-linux-2.19
-	plymouth? ( sys-boot/plymouth )"
+	plymouth? ( >=sys-boot/plymouth-0.8.4 )"
 
 # Vala-0.10 doesn't work with libnotify 0.7.1
 VALASLOT="0.12"
