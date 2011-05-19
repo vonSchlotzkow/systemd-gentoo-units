@@ -1,14 +1,14 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-168-r1.ebuild,v 1.1 2011/04/30 20:07:08 zzam Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-168-r2.ebuild,v 1.1 2011/05/14 14:00:34 zzam Exp $
 
 EAPI="1"
 
 inherit eutils flag-o-matic multilib toolchain-funcs linux-info autotools systemd
 
-#PATCHSET=${P}-gentoo-patchset-v1
-scriptversion=164-v2
-scriptname=${PN}-gentoo-scripts-${scriptversion}
+PATCHSET=${P}-gentoo-patchset-v1
+scriptversion=v3
+scriptname=udev-gentoo-scripts-${scriptversion}
 
 if [[ ${PV} == "9999" ]]; then
 	SRC_URI="mirror://gentoo/${scriptname}.tar.bz2"
@@ -28,6 +28,9 @@ HOMEPAGE="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+# The systemd use-flag is here only to make sure that this ebuild rather than
+# the one in the main tree is used for sys-apps/systemd, so that we can ensure
+# the installation of the systemd units.
 IUSE="selinux extras +openrc systemd test"
 
 COMMON_DEPEND="selinux? ( sys-libs/libselinux )
@@ -137,10 +140,7 @@ src_unpack() {
 		fi
 	fi
 
-	cd "${WORKDIR}/${scriptname}"
-
-	sed -e '/^LIBEXECDIR/s-$(LIBDIR)-lib-' -i Makefile \
-		|| die "patching Makefile failed"
+	#cd "${WORKDIR}/${scriptname}"
 
 	cd "${S}"
 
@@ -192,7 +192,7 @@ src_compile() {
 		$(use_with selinux) \
 		$(use_enable extras) \
 		--disable-introspection \
-		"$(use systemd && systemd_with_unitdir)"
+		"$(systemd_with_unitdir)"
 	# we don't have gobject-introspection in portage tree
 
 	emake || die "compiling udev failed"
