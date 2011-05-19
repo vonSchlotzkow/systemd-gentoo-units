@@ -1,21 +1,20 @@
-From 803277ff3b91f721846c90c092bb6306f2073810 Mon Sep 17 00:00:00 2001
+From 21e7fda25507e68c13b97040b3b9e5dc3c9726bf Mon Sep 17 00:00:00 2001
 From: Mu Qiao <qiaomuf@gentoo.org>
-Date: Sun, 6 Feb 2011 22:23:58 +0000
-Subject: [PATCH] remove tests
- Signed-off-by: Mu Qiao <qiaomuf@gentoo.org>
+Date: Wed, 18 May 2011 19:02:40 +0800
+Subject: [PATCH] fix-tests
 
 ---
  configure.ac                                    |    1 -
  system-settings/plugins/ifnet/Makefile.am       |    1 -
- system-settings/plugins/ifnet/tests/Makefile.am |   14 --------------
- 3 files changed, 0 insertions(+), 16 deletions(-)
+ system-settings/plugins/ifnet/tests/Makefile.am |   13 -------------
+ 3 files changed, 0 insertions(+), 15 deletions(-)
  delete mode 100644 system-settings/plugins/ifnet/tests/Makefile.am
 
 diff --git a/configure.ac b/configure.ac
-index 9cb0e9c..6c51a2a 100644
+index d8a266e..8304aa4 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -541,7 +541,6 @@ system-settings/plugins/Makefile
+@@ -571,7 +571,6 @@ system-settings/plugins/Makefile
  system-settings/plugins/ifupdown/Makefile
  system-settings/plugins/ifupdown/tests/Makefile
  system-settings/plugins/ifnet/Makefile
@@ -24,7 +23,7 @@ index 9cb0e9c..6c51a2a 100644
  system-settings/plugins/ifcfg-rh/tests/Makefile
  system-settings/plugins/ifcfg-rh/tests/network-scripts/Makefile
 diff --git a/system-settings/plugins/ifnet/Makefile.am b/system-settings/plugins/ifnet/Makefile.am
-index f63f8ca..b09cc8f 100644
+index 86d5ea2..f61e112 100644
 --- a/system-settings/plugins/ifnet/Makefile.am
 +++ b/system-settings/plugins/ifnet/Makefile.am
 @@ -1,4 +1,3 @@
@@ -34,10 +33,10 @@ index f63f8ca..b09cc8f 100644
  	-I$(top_srcdir)/include \
 diff --git a/system-settings/plugins/ifnet/tests/Makefile.am b/system-settings/plugins/ifnet/tests/Makefile.am
 deleted file mode 100644
-index ead3f1f..0000000
+index 17a081f..0000000
 --- a/system-settings/plugins/ifnet/tests/Makefile.am
 +++ /dev/null
-@@ -1,14 +0,0 @@
+@@ -1,13 +0,0 @@
 -INCLUDES=-I$(top_srcdir)/system-settings/plugins/ifnet\
 -	 -I$(top_srcdir)/libnm-glib \
 -	 -I$(top_srcdir)/libnm-util \
@@ -46,8 +45,7 @@ index ead3f1f..0000000
 -TESTS = check_ifnet
 -check_PROGRAMS = check_ifnet
 -check_ifnet_SOURCES = test_all.c 
--check_ifnet_LDFLAGS = -g
--check_ifnet_CPPFLAGS = $(CHECK_CFLAGS) $(GLIB_CFLAGS) -g
+-check_ifnet_CPPFLAGS = $(CHECK_CFLAGS) $(GLIB_CFLAGS)
 -check_ifnet_LDADD = $(top_srcdir)/libnm-util/libnm-util.la\
 -		    $(top_srcdir)/system-settings/plugins/ifnet/lib-ifnet-io.la\
 -		    $(CHECK_LIBS)\

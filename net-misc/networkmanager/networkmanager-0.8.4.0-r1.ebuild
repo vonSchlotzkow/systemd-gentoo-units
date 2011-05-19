@@ -1,10 +1,10 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-misc/networkmanager/networkmanager-0.8.2-r10.ebuild,v 1.1 2011/03/09 14:14:23 dagger Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-misc/networkmanager/networkmanager-0.8.4.0-r1.ebuild,v 1.1 2011/05/18 11:20:12 qiaomuf Exp $
 
 EAPI="2"
 
-inherit autotools eutils gnome.org linux-info systemd-local
+inherit autotools eutils gnome.org linux-info systemd
 
 # NetworkManager likes itself with capital letters
 MY_PN=${PN/networkmanager/NetworkManager}
@@ -43,8 +43,7 @@ RDEPEND=">=sys-apps/dbus-1.2
 	resolvconf? ( net-dns/openresolv )
 	connection-sharing? (
 		net-dns/dnsmasq
-		net-firewall/iptables )
-	systemd? ( sys-apps/systemd )"
+		net-firewall/iptables )"
 
 DEPEND="${RDEPEND}
 	dev-util/pkgconfig
@@ -67,10 +66,6 @@ sysfs_deprecated_check() {
 }
 
 pkg_setup() {
-	# FIXME. Required by -confchanges.patch, but the patch is invalid as
-	# ConsoleKit and PolicyKit is enough to get authorization.
-	enewgroup plugdev
-
 	if use kernel_linux; then
 		get_version
 		if linux_config_exists; then
@@ -85,29 +80,10 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# dbus policy patch
-	epatch "${FILESDIR}/${P}-confchanges.patch"
-	# accept "gw" in /etc/conf.d/net (bug #339215)
-	epatch "${FILESDIR}/${P}-accept-gw.patch"
-	# fix shared connection wrt bug #350476
-	# fix parsing dhclient.conf wrt bug #352638
+	# backported ifnet patches
 	epatch "${FILESDIR}/${P}-shared-connection.patch"
-	# Backports #1
-	epatch "${FILESDIR}/${P}-1.patch"
-	# won't crash upon startup for 32bit machines wrt bug #353807
-	epatch "${FILESDIR}/${P}-fix-timestamp.patch"
-	# fix tests wrt bug #353549
 	epatch "${FILESDIR}/${P}-fix-tests.patch"
-	# fix temporary files creation bug #349003
-	epatch "${FILESDIR}/${P}-fix-tempfiles.patch"
-	# won't write when nothing changed (bug #356339)
 	epatch "${FILESDIR}/${P}-ifnet-smarter-write.patch"
-	# don't pass trash arguments to dnsmasq. Fixes bug #357671
-	epatch "${FILESDIR}/${P}-fix-dnsmasq-config.patch"
-	# fix some crashes at shutdown
-	epatch "${FILESDIR}/${P}-fix-shutdown.patch"
-	# allow autodetection of openrc and systemd
-	epatch "${FILESDIR}/${P}-openrc-and-systemd.patch"
 	eautoreconf
 }
 
@@ -116,12 +92,12 @@ src_configure() {
 		--localstatedir=/var
 		--with-distro=gentoo
 		--with-dbus-sys-dir=/etc/dbus-1/system.d
-		--with-udev-dir=/etc/udev
+		--with-udev-dir=/lib/udev
 		--with-iptables=/sbin/iptables
 		$(use_enable doc gtk-doc)
 		$(use_with doc docs)
 		$(use_with resolvconf)
-		$(use_with_systemdsystemunitdir)"
+		$(systemd_with_unitdir)"
 
 	# default is dhcpcd (if none or both are specified), ISC dchclient otherwise
 	if use dhclient ; then
