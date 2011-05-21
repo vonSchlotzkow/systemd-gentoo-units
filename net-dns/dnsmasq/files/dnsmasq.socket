@@ -1,0 +1,21 @@
+[Unit]
+Description=dnsmasq socket
+
+[Socket]
+
+#DNS
+ListenDatagram=0.0.0.0:53
+ListenStream=0.0.0.0:53
+ListenDatagram=[::1]:53
+ListenStream=[::1]:53
+
+#DHCP uncomment this to use dhcp 
+#ListenDatagram=0.0.0.0:67
+#ListenDatagram=[::1]:67
+
+#TFTP, uncomment this to have tftp support
+#ListenDatagram=[::1]:53
+#ListenDatagram=0.0.0.0:53
+
+[Install]
+WantedBy=sockets.target

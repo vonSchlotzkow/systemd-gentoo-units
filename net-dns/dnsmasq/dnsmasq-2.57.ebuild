@@ -4,7 +4,7 @@
 
 EAPI=2
 
-inherit eutils toolchain-funcs flag-o-matic
+inherit eutils toolchain-funcs flag-o-matic systemd
 
 MY_P="${P/_/}"
 MY_PV="${PV/_/}"
@@ -14,7 +14,7 @@ SRC_URI="http://www.thekelleys.org.uk/dnsmasq/${MY_P}.tar.lzma"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 ~mips ~ppc ~ppc64 s390 sh sparc x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
 IUSE="dbus +dhcp idn ipv6 nls tftp"
 
 RDEPEND="dbus? ( sys-apps/dbus )
@@ -33,6 +33,7 @@ S="${WORKDIR}/${PN}-${MY_PV}"
 src_prepare() {
 	# dnsmasq on FreeBSD wants the config file in a silly location, this fixes
 	epatch "${FILESDIR}/${PN}-2.47-fbsd-config.patch"
+	epatch "${FILESDIR}/${P}-systemd.patch"
 }
 
 src_configure() {
@@ -72,4 +73,7 @@ src_install() {
 		insinto /etc/dbus-1/system.d
 		doins dbus/dnsmasq.conf
 	fi
+
+	systemd_dounit "${FILESDIR}/dnsmasq.service"
+	systemd_dounit "${FILESDIR}/dnsmasq.socket"
 }
