@@ -4,7 +4,7 @@
 
 EAPI=4
 
-inherit autotools git linux-info pam
+inherit autotools eutils git linux-info pam
 
 DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -70,6 +70,9 @@ pkg_setup() {
 }
 
 src_prepare() {
+	# Apply patches from /etc/portage/patches/sys-apps/systemd/
+	epatch_user
+
 	eautoreconf
 }
 
