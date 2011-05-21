@@ -4,7 +4,7 @@
 
 EAPI=4
 
-inherit linux-info pam
+inherit eutils linux-info pam
 
 DESCRIPTION="systemd is a system and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -71,6 +71,7 @@ pkg_setup() {
 src_prepare() {
 	# Force the rebuild of .vala sources
 	touch src/*.vala
+	epatch "${FILESDIR}"/mqueue-signed-int.patch
 }
 
 src_configure() {
