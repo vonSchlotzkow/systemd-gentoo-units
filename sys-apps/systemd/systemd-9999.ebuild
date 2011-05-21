@@ -14,7 +14,7 @@ EGIT_BRANCH="master"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="audit gtk pam selinux sysv +tcpwrap"
+IUSE="audit gtk pam plymouth selinux +tcpwrap"
 
 COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	sys-libs/libcap
@@ -28,7 +28,8 @@ COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	pam? ( virtual/pam )
 	selinux? ( sys-libs/libselinux )
 	tcpwrap? ( sys-apps/tcp-wrappers )
-	>=sys-apps/util-linux-2.19"
+	>=sys-apps/util-linux-2.19
+	plymouth? ( >=sys-boot/plymouth-0.8.4 )"
 
 # Vala-0.10 doesn't work with libnotify 0.7.1
 VALASLOT="0.12"
@@ -84,32 +85,18 @@ src_configure() {
 		$(use_enable tcpwrap)
 	"
 
-	if use sysv; then
-		myconf="
-			${myconf}
-			--with-sysvinit-path=/etc/init.d
-			--with-sysvrcd-path=/etc
-		"
-	else
-		myconf="
-			${myconf}
-			--with-sysvinit-path=
-			--with-sysvrcd-path=
-		"
-	fi
+	use gtk && export VALAC="$(type -p valac-${VALASLOT})"
 
-	if use gtk; then
-		export VALAC="$(type -p valac-${VALASLOT})"
-	fi
+	use plymouth && export have_plymouth=1
 
 	econf ${myconf}
 }
 
 src_install() {
-	emake DESTDIR="${D}" install || die "emake install failed"
+	emake DESTDIR="${D}" install
 
-	dodoc "${D}"/usr/share/doc/systemd/* &&
-		rm -r "${D}"/usr/share/doc/systemd
+	dodoc "${D}"/usr/share/doc/systemd/*
+	rm -rf "${D}"/usr/share/doc/systemd
 
 	cd "${D}"/usr/share/man/man8/
 	for i in halt poweroff reboot runlevel shutdown telinit; do
@@ -124,6 +111,7 @@ check_mtab_is_symlink() {
 		ewarn "${ROOT}etc/mtab must be a symlink to ${ROOT}proc/self/mounts!"
 		ewarn "To correct that, execute"
 		ewarn "    $ ln -sf '${ROOT}proc/self/mounts' '${ROOT}etc/mtab'"
+		elog
 	fi
 }
 
@@ -132,20 +120,33 @@ systemd_machine_id_setup() {
 	if ! "${ROOT}"bin/systemd-machine-id-setup; then
 		ewarn "Setting up /etc/machine-id failed, to fix it please see"
 		ewarn "  http://lists.freedesktop.org/archives/dbus/2011-March/014187.html"
+		elog
 	elif test ! -L "${ROOT}"var/lib/dbus/machine-id; then
 		# This should be fixed in the dbus ebuild, but we warn about it here.
 		ewarn "${ROOT}var/lib/dbus/machine-id ideally should be a symlink to"
 		ewarn "${ROOT}etc/machine-id to make it clear that they have the same"
 		ewarn "content."
+		elog
+	else
+		einfo
 	fi
 }
 
 check_var_run_is_symlink() {
 	if test ! -L "${ROOT}"var/run; then
-		einfo "${ROOT}var/run should be a symlink to ${ROOT}run. This is not"
-		einfo "trivial to change, and there is no hurry as it is currently"
-		einfo "bind-mounted at boot-time. You may be able to create the"
-		einfo "symlink by lazily unmounting ${ROOT}var/run first."
+		elog "${ROOT}var/run should be a symlink to ${ROOT}run. This is not"
+		elog "trivial to change, and there is no hurry as it is currently"
+		elog "bind-mounted at boot-time. You may be able to create the"
+		elog "symlink by lazily unmounting ${ROOT}var/run first."
+		elog
+	fi
+}
+
+check_var_lock_is_symlink() {
+	if test ! -L "${ROOT}"var/lock; then
+		elog "${ROOT}var/lock should be a symlink to ${ROOT}run/lock, see"
+		elog "  https://lwn.net/Articles/436012/"
+		elog
 	fi
 }
 
@@ -153,6 +154,7 @@ pkg_postinst() {
 	check_mtab_is_symlink
 	systemd_machine_id_setup
 	check_var_run_is_symlink
+	check_var_lock_is_symlink
 
 	# Inform user about extra configuration
 	elog "You may need to perform some additional configuration for some"
@@ -160,6 +162,7 @@ pkg_postinst() {
 	elog "handling tmpfiles:"
 	elog "    $ man modules-load.d"
 	elog "    $ man tmpfiles.d"
+	elog
 
 	ewarn "This is a work-in-progress ebuild. You may brick your system. Have fun!"
 }
