@@ -18,7 +18,7 @@ IUSE="audit gtk pam plymouth selinux +tcpwrap"
 COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
 	sys-libs/libcap
 	>=sys-fs/udev-163[systemd]
-	audit? ( sys-process/audit )
+	audit? ( >=sys-process/audit-2 )
 	gtk? (
 		dev-libs/dbus-glib
 		>=dev-libs/glib-2.26
