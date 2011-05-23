@@ -1,4 +1,4 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -17,7 +17,8 @@ IUSE=""
 
 CONFIG_CHECK="~PROC_EVENTS ~TASKSTATS ~TASK_DELAY_ACCT"
 
-RDEPEND="dev-lang/python"
+RDEPEND="!app-benchmarks/bootchart
+	dev-lang/python"
 DEPEND="${RDEPEND}"
 
 pkg_setup() {
@@ -29,7 +30,7 @@ src_compile() {
 }
 
 src_install() {
-	dodoc README README.pybootchart COPYING NEWS TODO || die
+	dodoc AUTHORS README README.pybootchart COPYING NEWS TODO || die
 
 	emake DESTDIR="${D}" install || die "died running make install, $FUNCNAME"
 }
