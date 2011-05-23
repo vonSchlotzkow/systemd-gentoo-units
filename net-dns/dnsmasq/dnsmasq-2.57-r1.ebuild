@@ -33,6 +33,8 @@ S="${WORKDIR}/${PN}-${MY_PV}"
 src_prepare() {
 	# dnsmasq on FreeBSD wants the config file in a silly location, this fixes
 	epatch "${FILESDIR}/${PN}-2.47-fbsd-config.patch"
+
+	# apply systemd patch
 	epatch "${FILESDIR}/${P}-systemd.patch"
 }
 
@@ -76,4 +78,18 @@ src_install() {
 
 	systemd_dounit "${FILESDIR}/dnsmasq.service"
 	systemd_dounit "${FILESDIR}/dnsmasq.socket"
+	use dhcp &&	systemd_dounit "${FILESDIR}/dnsmasq-dhcp.socket"
+	use tftp &&	systemd_dounit "${FILESDIR}/dnsmasq-tftp.socket"
+}
+
+pkg_postinst(){
+	einfo "We have installed systemd unit files.If you're using systemd, enable dnsmasq with"
+	einfo "systemctl enable ${PN}.socket"
+	if use dhcp || use tftp ; then
+		einfo "If you want to enable dhcp and ftp support in ${PN}, don't forget to run "
+		einfo "systemctl enable ${PN}-dhcp.socket "
+		einfo "and"
+		einfo "systemctl enable ${PN}-tftp.socket"
+		einfo "when you enable it in the ${PN} configure file"
+	fi
 }
