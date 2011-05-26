@@ -71,7 +71,6 @@ pkg_setup() {
 src_prepare() {
 	# Force the rebuild of .vala sources
 	touch src/*.vala
-	epatch "${FILESDIR}"/mqueue-signed-int.patch
 }
 
 src_configure() {
