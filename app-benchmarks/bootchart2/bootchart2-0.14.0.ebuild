@@ -43,6 +43,9 @@ src_unpack() {
 }
 
 src_prepare() {
+	# properly check for bootchart_init=/path on the kernel command line
+	epatch "${FILESDIR}"/0001-bootchartd-Look-for-bootchart_init-in-the-environmen.patch
+
 	# correct the version
 	if [[ "${PV}" = "9999" ]]; then
 		sed -i Makefile -e "s:VER=$(cat Makefile | grep VER= | cut -d"=" -f2):VER=git-$(date +%Y%m%d):"
@@ -83,5 +86,10 @@ pkg_postinst() {
 	elog
 	elog "Note: genkernel users should replace init= with real_init= in the above"
 	elog "see https://bugs.gentoo.org/show_bug.cgi?id=275251 for more info"
+	elog
+	elog "If you are not using an initrd, and you are not using /sbin/init as"
+	elog "your init systemd, you should also specify something like this on"
+	elog "your kernel command line"
+	elog "   bootchart_init=/path/to/init"
 	elog
 }
