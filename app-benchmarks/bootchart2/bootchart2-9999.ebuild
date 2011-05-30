@@ -4,7 +4,7 @@
 
 EAPI="3"
 
-inherit eutils multilib python linux-info systemd
+inherit eutils linux-info python systemd
 
 DESCRIPTION="Performance analysis and visualization of the system boot process"
 HOMEPAGE="https://github.com/mmeeks/bootchart"
@@ -30,10 +30,6 @@ RDEPEND="dev-lang/python
 	dev-python/pycairo[svg=]"
 DEPEND="${RDEPEND}"
 
-pkg_setup() {
-	linux-info_pkg_setup
-}
-
 src_unpack() {
 	if [[ "${PV}" = "9999" ]]; then
 		git_src_unpack
@@ -47,28 +43,24 @@ src_prepare() {
 	if [[ "${PV}" = "9999" ]]; then
 		sed -i Makefile -e "s:VER=$(cat Makefile | grep VER= | cut -d"=" -f2):VER=git-$(date +%Y%m%d):"
 	fi
-
-	# make systemd unit dir configurable
-	sed -i Makefile -e 's:^SYSTEMD_UNIT_DIR = :SYSTEMD_UNIT_DIR ?= :'
-}
-
-src_compile() {
-	emake \
-		LIBDIR="$(get_libdir)" || die "died running make, $FUNCNAME"
 }
 
 src_install() {
+	# Note: LIBDIR is hardcoded as /lib in collector/common.h, so we shouldn't
+	# just change it. Since no libraries are installed, /lib is fine.
 	emake \
 		DESTDIR="${D}" \
-		LIBDIR="$(get_libdir)" \
 		PY_LIBDIR="$(python_get_libdir)" \
-		SYSTEMD_UNIT_DIR="$(systemd_get_unitdir)" \
 		DOCDIR="/usr/share/doc/${PN}-${PVR}" \
 		install || die "died running make install, $FUNCNAME"
 
-	keepdir /$(get_libdir)/bootchart/tmpfs
+	keepdir /lib/bootchart/tmpfs
 
 	doinitd "${FILESDIR}/${PN}"
+
+	# Install systemd units where and whether the eclass wants them:
+	mv "${D}"/lib/systemd/system systemd-units || die
+	systemd_dounit systemd-units/* || die
 
 	prepalldocs
 
@@ -83,5 +75,10 @@ pkg_postinst() {
 	elog
 	elog "Note: genkernel users should replace init= with real_init= in the above"
 	elog "see https://bugs.gentoo.org/show_bug.cgi?id=275251 for more info"
+	elog
+	elog "If you are not using an initrd, and you are not using /sbin/init as"
+	elog "your init system, you must additionally specify something like this"
+	elog "on your kernel command line"
+	elog "   bootchart_init=/bin/systemd"
 	elog
 }
