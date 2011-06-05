@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.93.ebuild,v 1.1 2011/05/05 17:38:47 pacho Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.94.ebuild,v 1.1 2011/06/05 12:17:16 pacho Exp $
 
 EAPI="4"
 
@@ -12,7 +12,7 @@ HOMEPAGE="http://www.bluez.org/"
 # Because of oui.txt changing from time to time without noticement, we need to supply it
 # ourselves instead of using http://standards.ieee.org/regauth/oui/oui.txt directly.
 # See bugs #345263 and #349473 for reference.
-OUIDATE="20110505"
+OUIDATE="20110605"
 SRC_URI="mirror://kernel/linux/bluetooth/${P}.tar.gz
 	http://dev.gentoo.org/~pacho/bluez/oui-${OUIDATE}.txt.xz"
 LICENSE="GPL-2 LGPL-2.1"
@@ -151,9 +151,7 @@ src_install() {
 	insinto /var/lib/misc
 	newins "${WORKDIR}/oui-${OUIDATE}.txt" oui.txt
 
-	if use systemd; then
-		systemd_dounit "${FILESDIR}"/bluetooth.service
-	fi
+	systemd_dounit "${FILESDIR}"/bluetooth.service
 
 	find "${ED}" -name "*.la" -delete
 }
