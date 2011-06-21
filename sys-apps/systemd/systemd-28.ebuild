@@ -4,7 +4,7 @@
 
 EAPI=4
 
-inherit eutils linux-info pam
+inherit autotools-utils linux-info pam
 
 DESCRIPTION="System and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -16,7 +16,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="audit cryptsetup gtk pam plymouth selinux tcpd"
 
 COMMON_DEPEND=">=sys-apps/dbus-1.4.10
-	>=sys-fs/udev-163[systemd]
+	|| ( >=sys-fs/udev-171 >=sys-fs/udev-163[systemd] )
 	>=sys-apps/util-linux-2.19
 	sys-libs/libcap
 	audit? ( >=sys-process/audit-2 )
@@ -39,6 +39,8 @@ MINKV="2.6.38"
 
 RDEPEND="${COMMON_DEPEND}
 	sys-apps/systemd-units
+	!!sys-apps/systemd-dbus
+	!!sys-apps/systemd-udev
 	!<sys-apps/openrc-0.8.3"
 DEPEND="${COMMON_DEPEND}
 	gtk? ( dev-lang/vala:${VALASLOT} )
@@ -58,10 +60,11 @@ pkg_setup() {
 src_prepare() {
 	# Force the rebuild of .vala sources
 	touch src/*.vala || die
+	autotools-utils_src_prepare
 }
 
 src_configure() {
-	local myconf="
+	local myeconfargs=(
 		--with-distro=gentoo
 		--with-rootdir=
 		--localstatedir=/var
@@ -75,17 +78,17 @@ src_configure() {
 		# right now it is enabled on per-distro basis
 		# let's just hack into the check
 		$(use plymouth && echo have_plymouth=true)
-	"
+	)
 
 	if use gtk; then
 		export VALAC="$(type -p valac-${VALASLOT})"
 	fi
 
-	econf ${myconf}
+	autotools-utils_src_configure
 }
 
 src_install() {
-	emake DESTDIR="${D}" install
+	autotools-utils_src_install
 
 	dodoc "${D}"/usr/share/doc/systemd/*
 	rm -rf "${D}"/usr/share/doc/systemd || die
