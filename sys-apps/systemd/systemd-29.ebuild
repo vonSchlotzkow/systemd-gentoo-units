@@ -16,7 +16,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="audit cryptsetup gtk pam plymouth selinux tcpd"
 
 COMMON_DEPEND=">=sys-apps/dbus-1.4.10
-	|| ( >=sys-fs/udev-171 >=sys-fs/udev-163[systemd] )
+	>=sys-fs/udev-171
 	>=sys-apps/util-linux-2.19
 	sys-libs/libcap
 	audit? ( >=sys-process/audit-2 )
