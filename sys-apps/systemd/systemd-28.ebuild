@@ -6,60 +6,47 @@ EAPI=4
 
 inherit eutils linux-info pam
 
-DESCRIPTION="systemd is a system and service manager for Linux"
+DESCRIPTION="System and service manager for Linux"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
 SRC_URI="http://www.freedesktop.org/software/systemd/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="audit gtk pam plymouth selinux +tcpwrap"
+IUSE="audit cryptsetup gtk pam plymouth selinux tcpd"
 
-COMMON_DEPEND=">=sys-apps/dbus-1.4.8-r1
-	sys-libs/libcap
+COMMON_DEPEND=">=sys-apps/dbus-1.4.10
 	>=sys-fs/udev-163[systemd]
+	>=sys-apps/util-linux-2.19
+	sys-libs/libcap
 	audit? ( >=sys-process/audit-2 )
+	cryptsetup? ( sys-fs/cryptsetup )
 	gtk? (
 		dev-libs/dbus-glib
 		>=dev-libs/glib-2.26
 		x11-libs/gtk+:2
 		>=x11-libs/libnotify-0.7 )
 	pam? ( virtual/pam )
+	plymouth? ( sys-boot/plymouth )
 	selinux? ( sys-libs/libselinux )
-	tcpwrap? ( sys-apps/tcp-wrappers )
-	>=sys-apps/util-linux-2.19
-	plymouth? ( >=sys-boot/plymouth-0.8.4 )"
+	tcpd? ( sys-apps/tcp-wrappers )"
 
 # Vala-0.10 doesn't work with libnotify 0.7.1
 VALASLOT="0.12"
+# A little higher than upstream requires
+# but I had real trouble with 2.6.37 and systemd.
 MINKV="2.6.38"
 
 RDEPEND="${COMMON_DEPEND}
-	sys-apps/systemd-units"
+	sys-apps/systemd-units
+	!<sys-apps/openrc-0.8.3"
 DEPEND="${COMMON_DEPEND}
 	gtk? ( dev-lang/vala:${VALASLOT} )
 	>=sys-kernel/linux-headers-${MINKV}"
 
-check_no_uevent_hotplug_helper() {
-	local path
-	if linux_config_exists; then
-		path="$(linux_chkconfig_string UEVENT_HELPER_PATH)"
-		path="${path#\"}"
-		path="${path%\"}"
-		path="${path#\'}"
-		path="${path%\'}"
-		if test "${path}" != ""; then
-			qewarn "The kernel should be configured with"
-			qewarn "CONFIG_UEVENT_HELPER_PATH=\"\". Also, be sure to check"
-			qewarn "that /proc/sys/kernel/hotplug is empty."
-		fi
-	fi
-}
-
 pkg_pretend() {
 	local CONFIG_CHECK="AUTOFS4_FS CGROUPS DEVTMPFS ~FANOTIFY ~IPV6"
 	linux-info_pkg_setup
-	check_no_uevent_hotplug_helper
 	kernel_is -ge ${MINKV//./ } || die "Kernel version at least ${MINKV} required"
 }
 
@@ -70,7 +57,7 @@ pkg_setup() {
 
 src_prepare() {
 	# Force the rebuild of .vala sources
-	touch src/*.vala
+	touch src/*.vala || die
 }
 
 src_configure() {
@@ -79,15 +66,20 @@ src_configure() {
 		--with-rootdir=
 		--localstatedir=/var
 		$(use_enable audit)
+		$(use_enable cryptsetup libcryptsetup)
 		$(use_enable gtk)
 		$(use_enable pam)
 		$(use_enable selinux)
-		$(use_enable tcpwrap)
+		$(use_enable tcpd tcpwrap)
+
+		# right now it is enabled on per-distro basis
+		# let's just hack into the check
+		$(use plymouth && echo have_plymouth=true)
 	"
 
-	use gtk && export VALAC="$(type -p valac-${VALASLOT})"
-
-	use plymouth && export have_plymouth=1
+	if use gtk; then
+		export VALAC="$(type -p valac-${VALASLOT})"
+	fi
 
 	econf ${myconf}
 }
@@ -96,7 +88,7 @@ src_install() {
 	emake DESTDIR="${D}" install
 
 	dodoc "${D}"/usr/share/doc/systemd/*
-	rm -rf "${D}"/usr/share/doc/systemd
+	rm -rf "${D}"/usr/share/doc/systemd || die
 
 	cd "${D}"/usr/share/man/man8/
 	for i in halt poweroff reboot runlevel shutdown telinit; do
@@ -106,63 +98,24 @@ src_install() {
 	keepdir /run
 }
 
-check_mtab_is_symlink() {
-	if test ! -L "${ROOT}"etc/mtab; then
-		ewarn "${ROOT}etc/mtab must be a symlink to ${ROOT}proc/self/mounts!"
-		ewarn "To correct that, execute"
-		ewarn "    $ ln -sf '${ROOT}proc/self/mounts' '${ROOT}etc/mtab'"
-		elog
-	fi
-}
-
-systemd_machine_id_setup() {
-	einfo "Setting up /etc/machine-id..."
-	if ! "${ROOT}"bin/systemd-machine-id-setup; then
-		ewarn "Setting up /etc/machine-id failed, to fix it please see"
-		ewarn "  http://lists.freedesktop.org/archives/dbus/2011-March/014187.html"
-		elog
-	elif test ! -L "${ROOT}"var/lib/dbus/machine-id; then
-		# This should be fixed in the dbus ebuild, but we warn about it here.
-		ewarn "${ROOT}var/lib/dbus/machine-id ideally should be a symlink to"
-		ewarn "${ROOT}etc/machine-id to make it clear that they have the same"
-		ewarn "content."
-		elog
-	else
-		einfo
-	fi
-}
-
-check_var_run_is_symlink() {
-	if test ! -L "${ROOT}"var/run; then
-		elog "${ROOT}var/run should be a symlink to ${ROOT}run. This is not"
-		elog "trivial to change, and there is no hurry as it is currently"
-		elog "bind-mounted at boot-time. You may be able to create the"
-		elog "symlink by lazily unmounting ${ROOT}var/run first."
-		elog
-	fi
-}
-
-check_var_lock_is_symlink() {
-	if test ! -L "${ROOT}"var/lock; then
-		elog "${ROOT}var/lock should be a symlink to ${ROOT}run/lock, see"
-		elog "  https://lwn.net/Articles/436012/"
-		elog
-	fi
-}
-
 pkg_postinst() {
-	check_mtab_is_symlink
-	systemd_machine_id_setup
-	check_var_run_is_symlink
-	check_var_lock_is_symlink
+	if [[ ! -L "${ROOT}"etc/mtab ]]; then
+		ewarn "Upstream suggests that the /etc/mtab file should be a symlink to /proc/mounts."
+		ewarn "It is known to cause users being unable to unmount user mounts. If you don't"
+		ewarn "require that specific feature, please call:"
+		ewarn "	$ ln -sf '${ROOT}proc/self/mounts' '${ROOT}etc/mtab'"
+		ewarn
+	fi
 
-	# Inform user about extra configuration
-	elog "You may need to perform some additional configuration for some"
-	elog "programs to work, see the systemd manpages for loading modules and"
-	elog "handling tmpfiles:"
-	elog "    $ man modules-load.d"
-	elog "    $ man tmpfiles.d"
+	elog "You may need to perform some additional configuration for some programs"
+	elog "to work, see the systemd manpages for loading modules and handling tmpfiles:"
+	elog "	$ man modules-load.d"
+	elog "	$ man tmpfiles.d"
 	elog
 
-	ewarn "This is a work-in-progress ebuild. You may brick your system. Have fun!"
+	ewarn "Please note this is a work-in-progress and many packages in Gentoo"
+	ewarn "do not supply systemd unit files yet. You are testing it on your own"
+	ewarn "responsibility. Please remember than you can pass:"
+	ewarn "	init=/sbin/init"
+	ewarn "to your kernel to boot using sysvinit / OpenRC."
 }
