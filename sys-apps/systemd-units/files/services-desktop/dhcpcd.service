@@ -1,8 +1,0 @@
-[Unit]
-Description=Dhcpcd
-
-[Service]
-ExecStart=/sbin/dhcpcd -q --nobackground
-
-[Install]
-WantedBy=network.target
