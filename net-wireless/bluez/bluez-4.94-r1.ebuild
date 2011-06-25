@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.94-r1.ebuild,v 1.1 2011/06/08 10:42:41 pacho Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/bluez/bluez-4.94-r1.ebuild,v 1.2 2011/06/13 15:22:55 pacho Exp $
 
 EAPI="4"
 
@@ -19,13 +19,13 @@ LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~x86"
 
-IUSE="alsa caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat systemd test-programs usb"
+IUSE="alsa caps +consolekit cups debug gstreamer maemo6 health old-daemons pcmcia pnat test-programs usb"
 
 CDEPEND="
 	>=dev-libs/glib-2.14:2
 	media-libs/libsndfile
 	sys-apps/dbus
-	|| ( >=sys-fs/udev-146[extras] >=sys-fs/udev-169 )
+	>=sys-fs/udev-169
 	alsa? (
 		media-libs/alsa-lib[alsa_pcm_plugins_extplug,alsa_pcm_plugins_ioplug]
 	)
@@ -45,7 +45,6 @@ RDEPEND="${CDEPEND}
 	!net-wireless/bluez-libs
 	!net-wireless/bluez-utils
 	consolekit? ( sys-auth/consolekit )
-	consolekit? ( systemd? ( >=sys-auth/consolekit-0.4.4-r1 ) )
 	test-programs? (
 		dev-python/dbus-python
 		dev-python/pygobject:2
@@ -71,19 +70,9 @@ src_prepare() {
 			-e "s:cupsdir = \$(libdir)/cups:cupsdir = `cups-config --serverbin`:" \
 			Makefile.tools Makefile.in || die
 	fi
-
-	cp "${FILESDIR}/${PN}-4.18-udev.script" "${S}" || die
-	if use systemd; then
-		epatch "${FILESDIR}/${PN}-4.18-udev-systemd.patch"
-	fi
 }
 
 src_configure() {
-	local myconf
-	if has_version ">=sys-fs/udev-169"; then
-		myconf="--enable-hid2hci"
-	fi
-
 	econf \
 		$(use_enable caps capng) \
 		--enable-network \
@@ -111,7 +100,7 @@ src_configure() {
 		$(use_enable debug) \
 		--localstatedir=/var \
 		--disable-hal \
-		${myconf}
+		--enable-hid2hci
 }
 
 src_install() {
@@ -148,7 +137,7 @@ src_install() {
 	insinto /lib/udev/rules.d/
 	newins "${FILESDIR}/${PN}-4.18-udev.rules" 70-bluetooth.rules
 	exeinto /lib/udev/
-	newexe "${PN}-4.18-udev.script" bluetooth.sh
+	newexe "${FILESDIR}/${PN}-4.18-udev.script" bluetooth.sh
 
 	newinitd "${FILESDIR}/bluetooth-init.d" bluetooth
 	newconfd "${FILESDIR}/bluetooth-conf.d" bluetooth
