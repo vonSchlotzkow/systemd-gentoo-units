@@ -14,7 +14,7 @@ SRC_URI="basic? ( http://0pointer.de/public/systemd-units/sshd.service
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+basic +desktop server sysv"
+IUSE="+basic +desktop server"
 
 RDEPEND=""
 DEPEND=""
@@ -34,9 +34,5 @@ src_install() {
 
 	if use desktop; then
 		systemd_dounit "${FILESDIR}"/services-desktop/*
-	fi
-
-	if use sysv; then
-		systemd_dounit "${FILESDIR}"/services-sysv/*
 	fi
 }

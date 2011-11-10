@@ -10,6 +10,5 @@
 		<flag name='basic'>installs basic systemd files (used on desktop and on server)</flag>
 		<flag name='server'>installs server-related systemd files</flag>
 		<flag name='desktop'>installs desktop-related systemd files</flag>
-		<flag name='sysv'>installs sysv-compatibility related systemd files</flag>
 	</use>
 </pkgmetadata>
