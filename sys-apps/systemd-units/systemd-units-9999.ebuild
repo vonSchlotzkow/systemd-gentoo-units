@@ -14,7 +14,7 @@ SRC_URI="basic? ( http://0pointer.de/public/systemd-units/sshd.service
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+basic +desktop server"
+IUSE="+basic +desktop server +ingnome3"
 
 RDEPEND=""
 DEPEND=""
@@ -34,5 +34,9 @@ src_install() {
 
 	if use desktop; then
 		systemd_dounit "${FILESDIR}"/services-desktop/*
+
+		if ! use ingnome3; then
+			rm -f "${D}/$(systemd_get_unitdir)"/gdm@.service
+		fi
 	fi
 }
