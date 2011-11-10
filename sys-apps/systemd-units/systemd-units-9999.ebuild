@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=3
-inherit systemd
+inherit eutils systemd
 
 DESCRIPTION="Service files for sys-apps/systemd"
 HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd http://en.gentoo-wiki.com/wiki/Systemd"
@@ -19,12 +19,21 @@ IUSE="+basic +desktop server +ingnome3"
 RDEPEND=""
 DEPEND=""
 
+src_prepare() {
+	if use basic; then
+		cp "${DISTDIR}/sshd.service"  . || die
+		cp "${DISTDIR}/sshd.socket"   . || die
+		cp "${DISTDIR}/sshd@.service" . || die
+		epatch "${FILESDIR}"/sshd_at.patch || die
+	fi
+}
+
 src_install() {
 	if use basic; then
 		systemd_dounit "${FILESDIR}"/services-basic/*
-		systemd_dounit "${DISTDIR}/sshd.service"
-		systemd_dounit "${DISTDIR}/sshd.socket"
-		systemd_dounit "${DISTDIR}/sshd@.service"
+		systemd_dounit "sshd.service"
+		systemd_dounit "sshd.socket"
+		systemd_dounit "sshd@.service"
 	fi
 
 	if use server; then
