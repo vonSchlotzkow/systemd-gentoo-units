@@ -34,4 +34,8 @@ src_install() {
 			rm -f "${D}/$(systemd_get_unitdir)"/gdm@.service
 		fi
 	fi
+
+	# Files in portage cannot contain a literal '@' character. Therfore,
+	# convert the code string "_at" into an '@' before installing.
+	rename '_at' '@' "${D}/$(systemd_get_unitdir)"/*
 }
