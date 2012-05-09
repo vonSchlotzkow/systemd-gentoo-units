@@ -1,6 +1,5 @@
 [Unit]
 Description=fcron Cron Daemon
-After=syslog.target
 
 [Service]
 Type=simple
